@@ -1,0 +1,112 @@
+_subdirectory: template
+
+_envops:
+  trim_blocks: true
+  lstrip_blocks: true
+
+# ── Template variables ────────────────────────────────────────────────
+
+project_name:
+  type: str
+  help: "Package name (kebab-case), used in package.json and consts.ts"
+
+project_title:
+  type: str
+  help: "Short display title (e.g. 'Electronics'), shown in TopBar via consts.ts"
+
+project_description:
+  type: str
+  default: "A React frontend application"
+  help: "Full description for package.json and HTML title"
+
+author_name:
+  type: str
+  help: "Author name for package.json"
+
+author_email:
+  type: str
+  help: "Author email for package.json"
+
+repo_url:
+  type: str
+  default: ""
+  help: "Git repository URL"
+
+backend_port:
+  type: int
+  default: 5000
+  help: "Backend API port (Vite proxy target for /api)"
+
+sse_gateway_port:
+  type: int
+  default: 3001
+  help: "SSE Gateway port (Vite proxy target for /api/sse)"
+
+frontend_port:
+  type: int
+  default: 3000
+  help: "Vite dev server port"
+
+use_oidc:
+  type: bool
+  default: false
+  help: "Include OIDC authentication (auth context, auth gate, user dropdown, 401 handling)"
+
+use_s3:
+  type: bool
+  default: false
+  help: "Include S3 file upload components, file validation, thumbnail URL utilities"
+
+use_sse:
+  type: bool
+  default: false
+  help: "Include SSE context, SharedWorker, version tracking, deployment bar, task event hooks"
+
+# ── Files generated once, never overwritten ───────────────────────────
+
+_skip_if_exists:
+  - "src/lib/consts.ts"
+  - "src/app-theme.css"
+  - "src/components/layout/sidebar-nav.ts"
+  - "tests/support/fixtures.ts"
+  - "tests/support/selectors-domain.ts"
+  - "package.json"
+  - ".env.example"
+  - "Dockerfile"
+  - "nginx.conf"
+  - "public/favicon.png"
+
+# ── Feature-flagged file exclusion ────────────────────────────────────
+
+_exclude:
+  # OIDC
+  - "{% if not use_oidc %}src/contexts/auth-context.tsx{% endif %}"
+  - "{% if not use_oidc %}src/providers/auth-providers.tsx{% endif %}"
+  - "{% if not use_oidc %}src/hooks/use-auth.ts{% endif %}"
+  - "{% if not use_oidc %}src/components/auth{% endif %}"
+  - "{% if not use_oidc %}src/components/layout/user-dropdown.tsx{% endif %}"
+  - "{% if not use_oidc %}src/lib/auth-redirect.ts{% endif %}"
+
+  # SSE
+  - "{% if not use_sse %}src/contexts/sse-context.ts{% endif %}"
+  - "{% if not use_sse %}src/contexts/sse-context-base.ts{% endif %}"
+  - "{% if not use_sse %}src/contexts/sse-context-provider.tsx{% endif %}"
+  - "{% if not use_sse %}src/contexts/deployment-context.ts{% endif %}"
+  - "{% if not use_sse %}src/contexts/deployment-context-base.ts{% endif %}"
+  - "{% if not use_sse %}src/contexts/deployment-context-provider.tsx{% endif %}"
+  - "{% if not use_sse %}src/providers/sse-providers.tsx{% endif %}"
+  - "{% if not use_sse %}src/hooks/use-sse-task.ts{% endif %}"
+  - "{% if not use_sse %}src/hooks/use-version-sse.ts{% endif %}"
+  - "{% if not use_sse %}src/hooks/use-deployment-notification.ts{% endif %}"
+  - "{% if not use_sse %}src/lib/config/sse-request-id.ts{% endif %}"
+  - "{% if not use_sse %}src/workers{% endif %}"
+  - "{% if not use_sse %}src/components/ui/deployment-notification-bar.tsx{% endif %}"
+  - "{% if not use_sse %}tests/support/helpers/deployment-sse.ts{% endif %}"
+  - "{% if not use_sse %}tests/support/helpers/deployment-reset.ts{% endif %}"
+
+  # S3
+  - "{% if not use_s3 %}src/lib/utils/file-validation.ts{% endif %}"
+  - "{% if not use_s3 %}src/lib/utils/thumbnail-urls.ts{% endif %}"
+  - "{% if not use_s3 %}src/components/ui/drop-zone.tsx{% endif %}"
+  - "{% if not use_s3 %}src/components/ui/thumbnail.tsx{% endif %}"
+  - "{% if not use_s3 %}tests/support/helpers/file-upload.ts{% endif %}"

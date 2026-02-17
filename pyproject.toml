@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "modern-app-frontend-template"
+version = "0.1.0"
+description = "Copier-based frontend template for React/Vite/TypeScript projects"
+authors = ["Template Author"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+copier = "^9.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

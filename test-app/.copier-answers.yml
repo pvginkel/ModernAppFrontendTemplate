@@ -1,0 +1,14 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_src_path: .
+author_email: test@example.com
+author_name: Test Author
+backend_port: 5000
+frontend_port: 3000
+project_description: Test application
+project_name: test-app
+project_title: Test App
+repo_url: https://github.com/test/test-app.git
+sse_gateway_port: 3001
+use_oidc: true
+use_s3: true
+use_sse: true

@@ -1,0 +1,42 @@
+/**
+ * Composed provider tree.
+ * Nests active provider groups based on enabled features.
+ *
+ * Provider ordering:
+ * 1. CoreProviders: QueryClientProvider > ToastProvider > QuerySetup (always)
+{% if use_oidc %}
+ * 2. AuthProviders: AuthProvider > AuthGate (use_oidc)
+{% endif %}
+{% if use_sse %}
+ * {{ "3" if use_oidc else "2" }}. SseProviders: SseContextProvider > DeploymentProvider (use_sse)
+{% endif %}
+ */
+
+import type { ReactNode } from 'react';
+import { CoreProviders } from './core-providers';
+{% if use_oidc %}
+import { AuthProviders } from './auth-providers';
+{% endif %}
+{% if use_sse %}
+import { SseProviders } from './sse-providers';
+{% endif %}
+
+export function Providers({ children }: { children: ReactNode }) {
+  return (
+    <CoreProviders>
+{% if use_oidc %}
+      <AuthProviders>
+{% endif %}
+{% if use_sse %}
+        <SseProviders>
+{% endif %}
+          {children}
+{% if use_sse %}
+        </SseProviders>
+{% endif %}
+{% if use_oidc %}
+      </AuthProviders>
+{% endif %}
+    </CoreProviders>
+  );
+}
