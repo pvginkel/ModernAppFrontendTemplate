@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { Sidebar } from '@/components/layout/sidebar';
 import { TopBar } from '@/components/layout/top-bar';
-import { DeploymentNotificationBar } from '@/components/ui/deployment-notification-bar';
+import { DeploymentNotificationBar } from '@/components/primitives/deployment-notification-bar';
 import { Providers } from '@/providers';
 
 export const Route = createRootRoute({

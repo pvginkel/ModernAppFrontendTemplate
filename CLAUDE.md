@@ -69,14 +69,14 @@ Infrastructure code — config, core source, providers, contexts, hooks, lib, co
 
 ### App-maintained (`_skip_if_exists` — generated once, never overwritten)
 - `src/lib/consts.ts` — project name, title, description, ports
-- `src/app-theme.css` — brand colors, custom CSS tokens
+- `src/styles/app-theme.css` — brand colors, custom CSS tokens
+- `src/styles/*.ts` — component variant configs (button, alert, card, toast, input, etc.)
+- `src/components/ui/` — pure styled components (badge, skeleton, label, etc.)
 - `src/components/layout/sidebar-nav.ts` — app-specific navigation items
 - `tests/support/fixtures.ts` — extends infrastructure with domain page objects
 - `tests/support/selectors-domain.ts` — domain-specific selectors
 - `package.json` — dependencies (app manages after generation)
 - `.env.example` — environment documentation
-- `Dockerfile` — production container
-- `nginx.conf` — production NGINX config
 - `public/favicon.png` — app icon
 
 ## Feature Flags
@@ -93,11 +93,12 @@ The app customizes behavior through extension points:
 
 1. **Project identity** — `src/lib/consts.ts` (name, title, ports)
 2. **Navigation items** — `src/components/layout/sidebar-nav.ts`
-3. **Brand theme** — `src/app-theme.css`
-4. **Routes** — file-based routes under `src/routes/`
-5. **API layer** — regenerate `src/lib/api/generated/` from OpenAPI spec
-6. **Test fixtures** — extend `tests/support/fixtures-infrastructure.ts` in `tests/support/fixtures.ts`
-7. **Test selectors** — add domain selectors in `tests/support/selectors-domain.ts`
+3. **Brand theme** — `src/styles/app-theme.css`
+4. **Component variants** — `src/styles/*.ts` (button, alert, card, toast, etc.)
+5. **Routes** — file-based routes under `src/routes/`
+6. **API layer** — regenerate `src/lib/api/generated/` from OpenAPI spec
+7. **Test fixtures** — extend `tests/support/fixtures-infrastructure.ts` in `tests/support/fixtures.ts`
+8. **Test selectors** — add domain selectors in `tests/support/selectors-domain.ts`
 
 ## Reference App
 

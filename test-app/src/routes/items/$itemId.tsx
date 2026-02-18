@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useGetItemsByItemId } from '@/lib/api/generated/hooks'
 import { DetailScreenLayout } from '@/components/layout/detail-screen-layout'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Alert } from '@/components/ui/alert'
+import { Alert } from '@/components/primitives/alert'
 
 export const Route = createFileRoute('/items/$itemId')({
   component: ItemDetail,

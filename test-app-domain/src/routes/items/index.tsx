@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useGetItems } from '@/lib/api/generated/hooks'
 import { ListScreenLayout } from '@/components/layout/list-screen-layout'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/primitives/button'
+import { Card, CardContent } from '@/components/primitives/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Alert } from '@/components/ui/alert'
+import { Alert } from '@/components/primitives/alert'
 import { Plus } from 'lucide-react'
 
 export const Route = createFileRoute('/items/')({

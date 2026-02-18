@@ -65,16 +65,27 @@ use_sse:
 # ── Files generated once, never overwritten ───────────────────────────
 
 _skip_if_exists:
+  # App identity
   - "src/lib/consts.ts"
-  - "src/app-theme.css"
   - "src/components/layout/sidebar-nav.ts"
-  - "tests/support/fixtures.ts"
-  - "tests/support/selectors-domain.ts"
   - "package.json"
   - ".env.example"
-  - "Dockerfile"
-  - "nginx.conf"
   - "public/favicon.png"
+  # App-owned styling (theme + variant configs)
+  - "src/styles/app-theme.css"
+  - "src/styles/button.ts"
+  - "src/styles/alert.ts"
+  - "src/styles/card.ts"
+  - "src/styles/toast.ts"
+  - "src/styles/input.ts"
+  - "src/styles/notification.ts"
+  - "src/styles/progress-bar.ts"
+  - "src/styles/index.ts"
+  # App-owned styled components
+  - "src/components/ui"
+  # App-owned test extensions
+  - "tests/support/fixtures.ts"
+  - "tests/support/selectors-domain.ts"
 
 # ── Feature-flagged file exclusion ────────────────────────────────────
 
@@ -100,13 +111,13 @@ _exclude:
   - "{% if not use_sse %}src/hooks/use-deployment-notification.ts{% endif %}"
   - "{% if not use_sse %}src/lib/config/sse-request-id.ts{% endif %}"
   - "{% if not use_sse %}src/workers{% endif %}"
-  - "{% if not use_sse %}src/components/ui/deployment-notification-bar.tsx{% endif %}"
+  - "{% if not use_sse %}src/components/primitives/deployment-notification-bar.tsx{% endif %}"
   - "{% if not use_sse %}tests/support/helpers/deployment-sse.ts{% endif %}"
   - "{% if not use_sse %}tests/support/helpers/deployment-reset.ts{% endif %}"
 
   # S3
   - "{% if not use_s3 %}src/lib/utils/file-validation.ts{% endif %}"
   - "{% if not use_s3 %}src/lib/utils/thumbnail-urls.ts{% endif %}"
-  - "{% if not use_s3 %}src/components/ui/drop-zone.tsx{% endif %}"
+  - "{% if not use_s3 %}src/components/primitives/drop-zone.tsx{% endif %}"
   - "{% if not use_s3 %}src/components/ui/thumbnail.tsx{% endif %}"
   - "{% if not use_s3 %}tests/support/helpers/file-upload.ts{% endif %}"

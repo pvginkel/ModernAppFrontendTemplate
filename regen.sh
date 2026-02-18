@@ -32,7 +32,7 @@ echo "==> Copying domain files from test-app-domain..."
 
 # App identity
 cp test-app-domain/src/lib/consts.ts test-app/src/lib/consts.ts
-cp test-app-domain/src/app-theme.css test-app/src/app-theme.css
+cp test-app-domain/src/styles/app-theme.css test-app/src/styles/app-theme.css
 cp test-app-domain/src/components/layout/sidebar-nav.ts test-app/src/components/layout/sidebar-nav.ts
 
 # Domain routes
