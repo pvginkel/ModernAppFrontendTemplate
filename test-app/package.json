@@ -56,6 +56,7 @@
     "openapi-typescript": "^7.0.0",
     "typescript": "~5.9.0",
     "typescript-eslint": "^8.39.1",
+    "ssegateway": "git+https://github.com/pvginkel/SSEGateway.git#stable",
     "vite": "^7.1.2"
   }
 }
