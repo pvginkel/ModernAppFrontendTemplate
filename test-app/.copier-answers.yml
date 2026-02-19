@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: v0.2-1-gc8dd0ce
+_commit: v0.3-2-ge48bb53
 _src_path: .
 author_email: test@example.com
 author_name: Test Author
@@ -11,5 +11,4 @@ project_title: Test App
 repo_url: https://github.com/test/test-app.git
 sse_gateway_port: 3001
 use_oidc: true
-use_s3: true
 use_sse: true

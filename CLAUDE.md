@@ -84,7 +84,6 @@ Infrastructure code — config, core source, providers, contexts, hooks, lib, co
 | Flag | Controls |
 |------|----------|
 | `use_oidc` | OIDC auth context, auth gate, user dropdown, login redirect, 401 handling |
-| `use_s3` | File upload components, file validation, thumbnail URL utilities |
 | `use_sse` | SSE context, SharedWorker, version tracking, deployment bar, task event hooks |
 
 ## Hook Contract

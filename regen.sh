@@ -25,7 +25,6 @@ poetry run copier copy . test-app --trust --defaults --vcs-ref HEAD \
   -d sse_gateway_port=3001 \
   -d frontend_port=3000 \
   -d use_oidc=true \
-  -d use_s3=true \
   -d use_sse=true
 
 echo "==> Copying domain files from test-app-domain..."

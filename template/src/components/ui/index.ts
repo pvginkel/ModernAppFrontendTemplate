@@ -25,11 +25,9 @@ export { CapacityBar, type CapacityBarProps } from './capacity-bar';
 // Card link component
 export { CardLink } from './card-link';
 
-{% if use_s3 %}
 // Thumbnail component
 export { Thumbnail } from './thumbnail';
 
-{% endif %}
 // Skeleton component
 export { Skeleton } from './skeleton';
 

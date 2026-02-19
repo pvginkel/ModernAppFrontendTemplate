@@ -18,7 +18,6 @@ Copier-based template for generating self-contained React/Vite/TypeScript fronte
 | Flag | What it includes |
 |------|-----------------|
 | `use_oidc` | Auth context, auth gate, user dropdown, login redirect, 401 handling |
-| `use_s3` | File upload drop-zone, file validation, thumbnail URL utilities |
 | `use_sse` | SSE context, SharedWorker, version tracking, deployment notification bar, task event hooks |
 
 Features are toggled at generation time. Disabled features exclude the relevant files entirely (no dead code).
@@ -116,15 +115,18 @@ Components are split by ownership:
 
 ## Jinja Files
 
-The template uses 6 `.jinja` files (all others are plain files):
+The template uses 9 `.jinja` files (all others are plain files):
 
 | File | What's parameterized |
 |------|---------------------|
 | `index.html.jinja` | `<title>` from `project_description` |
 | `package.json.jinja` | Project name, description, dev server port |
 | `vite.config.ts.jinja` | Backend/SSE proxy ports, SSE proxy block conditional |
+| `src/lib/consts.ts.jinja` | Project name, title, description, ports |
 | `src/providers/index.tsx.jinja` | Conditional provider imports (OIDC, SSE) |
 | `src/routes/__root.tsx.jinja` | Conditional DeploymentNotificationBar (SSE) |
+| `src/components/primitives/index.ts.jinja` | Conditional DeploymentNotificationBar export (SSE) |
+| `tests/support/fixtures-infrastructure.ts.jinja` | Conditional SSE fixtures |
 | `{{ _copier_conf.answers_file }}.jinja` | Standard copier answers file |
 
 ## Working on the Template
