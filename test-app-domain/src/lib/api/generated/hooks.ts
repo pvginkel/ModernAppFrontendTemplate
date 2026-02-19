@@ -132,13 +132,13 @@ export function useGetItems(params?: any, options?: Omit<Parameters<typeof useQu
 /**
  * Create a new item.
  */
-export function usePostItems(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<void, Error, void>> {
+export function usePostItems(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<void, Error, { body: any }>> {
   const queryClient = useQueryClient();
 
   // @ts-ignore
   return useMutation({
-    mutationFn: async () => {
-      const result = await api.POST('/api/items' as const) as { data?: unknown; error?: unknown; response: Response };
+    mutationFn: async (variables: { body: any }) => {
+      const result = await api.POST('/api/items' as const, { body: variables.body }) as { data?: unknown; error?: unknown; response: Response };
       if (result.error) throw toApiError(result.error, result.response.status);
       return result.data;
     },

@@ -13,7 +13,7 @@ export const Route = createFileRoute('/items/')({
 
 function ItemsList() {
   const { data: rawData, isLoading, error } = useGetItems()
-  const items = (rawData as any[] | undefined) ?? []
+  const items = ((rawData as any)?.items as any[] | undefined) ?? []
 
   return (
     <ListScreenLayout

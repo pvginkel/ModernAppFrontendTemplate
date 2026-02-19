@@ -60,6 +60,26 @@ cp test-app-domain/tests/support/selectors-domain.ts test-app/tests/support/sele
 # Favicon
 cp test-app-domain/public/favicon.png test-app/public/favicon.png 2>/dev/null || true
 
+echo "==> Copying infrastructure tests from mother project..."
+
+# Infrastructure page objects
+mkdir -p test-app/tests/support/page-objects
+cp tests/support/page-objects/base-page.ts test-app/tests/support/page-objects/
+cp tests/support/page-objects/app-shell-page.ts test-app/tests/support/page-objects/
+
+# Infrastructure test specs
+mkdir -p test-app/tests/e2e/auth
+mkdir -p test-app/tests/e2e/deployment
+mkdir -p test-app/tests/e2e/shell
+mkdir -p test-app/tests/e2e/parallel
+cp tests/e2e/test-infrastructure.spec.ts test-app/tests/e2e/
+cp tests/e2e/auth/AuthPage.ts test-app/tests/e2e/auth/
+cp tests/e2e/auth/auth.spec.ts test-app/tests/e2e/auth/
+cp tests/e2e/deployment/deployment-banner.spec.ts test-app/tests/e2e/deployment/
+cp tests/e2e/shell/navigation.spec.ts test-app/tests/e2e/shell/
+cp tests/e2e/shell/mobile-menu.spec.ts test-app/tests/e2e/shell/
+cp tests/e2e/parallel/worker-isolation.spec.ts test-app/tests/e2e/parallel/
+
 echo "# Test App" > test-app/README.md
 
 echo "==> Installing dependencies..."
