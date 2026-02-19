@@ -13,6 +13,7 @@ export const buttonVariants = {
   ghost: 'hover:bg-accent hover:text-accent-foreground',
   ai_assisted: 'bg-gradient-to-r from-[#0afecf] to-[#16bbd4] ai-glare',
   filter: 'border border-input bg-background text-foreground hover:opacity-80 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:border-primary',
+  destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
 } as const;
 
 export const buttonSizes = {

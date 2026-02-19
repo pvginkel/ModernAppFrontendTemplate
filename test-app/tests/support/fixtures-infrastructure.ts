@@ -284,6 +284,7 @@ export const infrastructureFixtures = base.extend<InfrastructureFixtures, Intern
       }
     },
 
+
     appShell: async ({ page }, use) => {
       await use(new AppShellPage(page));
     },
@@ -540,3 +541,6 @@ export const infrastructureFixtures = base.extend<InfrastructureFixtures, Intern
     ],
   }
 );
+
+export const test = infrastructureFixtures;
+export { expect } from '@playwright/test';
