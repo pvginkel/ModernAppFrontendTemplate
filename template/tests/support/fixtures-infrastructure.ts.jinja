@@ -21,11 +21,15 @@ import {
   releaseTestEventBridge,
 } from './helpers/test-events';
 import { ToastHelper, createToastHelper } from './helpers/toast-helpers';
+{% if use_sse %}
 import {
   DeploymentSseHelper,
   createDeploymentSseHelper,
 } from './helpers/deployment-sse';
+{% endif %}
+{% if use_s3 %}
 import { FileUploadHelper, createFileUploadHelper } from './helpers/file-upload';
+{% endif %}
 import { AuthFactory } from './helpers/auth-factory';
 import { AppShellPage } from './page-objects/app-shell-page';
 import { startBackend, startFrontend, startSSEGateway } from './process/servers';
@@ -59,8 +63,12 @@ export type InfrastructureFixtures = {
   sseTimeout: number;
   testEvents: TestEventCapture;
   toastHelper: ToastHelper;
+{% if use_s3 %}
   fileUploadHelper: FileUploadHelper;
+{% endif %}
+{% if use_sse %}
   deploymentSse: DeploymentSseHelper;
+{% endif %}
   auth: AuthFactory;
   appShell: AppShellPage;
 };
@@ -266,11 +274,14 @@ export const infrastructureFixtures = base.extend<InfrastructureFixtures, Intern
       await use(toastHelper);
     },
 
+{% if use_s3 %}
     fileUploadHelper: async ({ page }, use) => {
       const fileUploadHelper = createFileUploadHelper(page);
       await use(fileUploadHelper);
     },
 
+{% endif %}
+{% if use_sse %}
     deploymentSse: async ({ page }, use) => {
       const helper = createDeploymentSseHelper(page);
       try {
@@ -283,6 +294,8 @@ export const infrastructureFixtures = base.extend<InfrastructureFixtures, Intern
         }
       }
     },
+
+{% endif %}
 
     appShell: async ({ page }, use) => {
       await use(new AppShellPage(page));
@@ -540,3 +553,6 @@ export const infrastructureFixtures = base.extend<InfrastructureFixtures, Intern
     ],
   }
 );
+
+export const test = infrastructureFixtures;
+export { expect } from '@playwright/test';
