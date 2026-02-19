@@ -19,6 +19,10 @@ export class BasePage {
     await this.page.waitForLoadState('networkidle', options);
   }
 
+  getUrl(): string {
+    return this.page.url();
+  }
+
   getButton(text: string | RegExp): Locator {
     return this.page.getByRole('button', { name: text });
   }

@@ -250,12 +250,7 @@ export function SseContextProvider({ children }: SseContextProviderProps) {
                          Math.random().toString(36).substring(2, 15);
 
     const params = new URLSearchParams({ request_id: tabRequestId });
-
-    // In test mode, connect directly to SSE Gateway if URL is provided (bypasses Vite proxy)
-    const gatewayUrl = import.meta.env.VITE_SSE_GATEWAY_URL;
-    const url = gatewayUrl && isTestMode()
-      ? `${gatewayUrl}/api/sse/stream${params ? `?${params}` : ''}`
-      : `/api/sse/stream?${params}`;
+    const url = `/api/sse/stream?${params}`;
 
     const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;
