@@ -80,6 +80,9 @@ cp tests/e2e/shell/navigation.spec.ts test-app/tests/e2e/shell/
 cp tests/e2e/shell/mobile-menu.spec.ts test-app/tests/e2e/shell/
 cp tests/e2e/parallel/worker-isolation.spec.ts test-app/tests/e2e/parallel/
 
+# Test environment overrides (e.g. BACKEND_ROOT for the template's directory layout)
+cp .env.test test-app/.env.test
+
 echo "# Test App" > test-app/README.md
 
 echo "==> Installing dependencies..."
