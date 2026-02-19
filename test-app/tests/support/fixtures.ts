@@ -1,11 +1,10 @@
 /**
  * Domain-specific test fixtures for the test application.
- * Extends infrastructure fixtures with Items page objects and app shell.
+ * Extends infrastructure fixtures with Items page objects.
  */
 
 /* eslint-disable react-hooks/rules-of-hooks */
 import { infrastructureFixtures, type InfrastructureFixtures } from './fixtures-infrastructure';
-import { AppShellPage } from './page-objects/app-shell-page';
 import type { Page } from '@playwright/test';
 
 class ItemsPage {
@@ -27,15 +26,11 @@ class ItemsPage {
 
 interface DomainFixtures extends InfrastructureFixtures {
   items: ItemsPage;
-  appShell: AppShellPage;
 }
 
 export const test = infrastructureFixtures.extend<DomainFixtures>({
   items: async ({ page }, use) => {
     await use(new ItemsPage(page));
-  },
-  appShell: async ({ page }, use) => {
-    await use(new AppShellPage(page));
   },
 });
 

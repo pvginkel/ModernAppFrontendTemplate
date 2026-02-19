@@ -27,6 +27,7 @@ import {
 } from './helpers/deployment-sse';
 import { FileUploadHelper, createFileUploadHelper } from './helpers/file-upload';
 import { AuthFactory } from './helpers/auth-factory';
+import { AppShellPage } from './page-objects/app-shell-page';
 import { startBackend, startFrontend, startSSEGateway } from './process/servers';
 import {
   createBackendLogCollector,
@@ -61,6 +62,7 @@ export type InfrastructureFixtures = {
   fileUploadHelper: FileUploadHelper;
   deploymentSse: DeploymentSseHelper;
   auth: AuthFactory;
+  appShell: AppShellPage;
 };
 
 type InternalFixtures = {
@@ -280,6 +282,10 @@ export const infrastructureFixtures = base.extend<InfrastructureFixtures, Intern
           // Ignore cleanup failures; the page may have navigated away.
         }
       }
+    },
+
+    appShell: async ({ page }, use) => {
+      await use(new AppShellPage(page));
     },
 
     auth: async ({ _serviceManager, page }, use) => {

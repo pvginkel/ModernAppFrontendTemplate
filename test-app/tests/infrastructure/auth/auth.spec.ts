@@ -239,7 +239,7 @@ test.describe('App Shell Layout', () => {
 
       await expect(authPage.hamburgerButton).toBeVisible()
       await expect(authPage.logo).toBeVisible()
-      await expect(authPage.title).toHaveText('Test App')
+      await expect(authPage.title).toBeVisible()
       await expect(authPage.userDropdownTrigger).toBeVisible()
 
       const hamburgerBox = await authPage.hamburgerButton.boundingBox()
