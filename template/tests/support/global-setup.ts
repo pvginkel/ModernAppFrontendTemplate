@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { access, mkdtemp, writeFile } from 'node:fs/promises';
+import { access, mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,32 +15,30 @@ async function globalSetup() {
     );
   }
 
-  console.log('Setting up Playwright tests...');
+  console.log('🔧 Setting up Playwright tests...');
   console.log('Service management: Per-worker (Playwright managed)');
 
   const seededDbPath = await initializeSeedDatabase();
-  process.env.PLAYWRIGHT_SEEDED_SQLITE_DB = seededDbPath;
-  console.log(`Seeded Playwright SQLite database: ${seededDbPath}`);
-  console.log('Worker fixtures will boot backend, SSE gateway, and frontend on demand');
+  if (seededDbPath) {
+    process.env.PLAYWRIGHT_SEEDED_SQLITE_DB = seededDbPath;
+    console.log(`🗃️  Seeded Playwright SQLite database: ${seededDbPath}`);
+  }
+  console.log('⏭️  Worker fixtures will boot backend, SSE gateway, and frontend on demand');
 }
 
 export default globalSetup;
 
-async function initializeSeedDatabase(): Promise<string> {
+async function initializeSeedDatabase(): Promise<string | null> {
   const repoRoot = getRepoRoot();
   const backendRoot = resolve(repoRoot, process.env.BACKEND_ROOT || '../backend');
   const scriptPath = resolve(backendRoot, 'scripts/initialize-sqlite-database.sh');
 
-  // Check if the database initialization script exists.
   // Apps without a database (use_database=false) won't have this script.
   const scriptExists = await access(scriptPath).then(() => true, () => false);
 
   if (!scriptExists) {
-    console.log('Database initialization script not found; skipping SQLite database handling.');
-    const tmpRoot = await mkdtemp(join(tmpdir(), 'pw-no-db-'));
-    const dbPath = join(tmpRoot, 'placeholder.sqlite');
-    await writeFile(dbPath, '');
-    return dbPath;
+    console.log('ℹ️  Database initialization script not found; skipping SQLite database seeding.');
+    return null;
   }
 
   const tmpRoot = await mkdtemp(join(tmpdir(), 'pw-seed-'));
