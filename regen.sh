@@ -24,6 +24,7 @@ poetry run copier copy . test-app --trust --defaults --vcs-ref HEAD \
   -d backend_port=5000 \
   -d sse_gateway_port=3001 \
   -d frontend_port=3000 \
+  -d image_name="registry:5000/test-app" \
   -d use_oidc=true \
   -d use_sse=true
 

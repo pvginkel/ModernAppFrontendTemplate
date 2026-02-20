@@ -47,6 +47,11 @@ frontend_port:
   default: 3000
   help: "Vite dev server port"
 
+image_name:
+  type: str
+  default: "registry:5000/{{ project_name }}"
+  help: "Docker image name (used in Jenkinsfile and build scripts)"
+
 use_oidc:
   type: bool
   default: false
