@@ -3,10 +3,14 @@
  * Composes provider groups and renders the app shell.
  */
 
+{% if use_app_shell %}
 import { useState } from 'react';
+{% endif %}
 import { createRootRoute, Outlet } from '@tanstack/react-router';
+{% if use_app_shell %}
 import { Sidebar } from '@/components/layout/sidebar';
 import { TopBar } from '@/components/layout/top-bar';
+{% endif %}
 {% if use_sse %}
 import { DeploymentNotificationBar } from '@/components/primitives/deployment-notification-bar';
 {% endif %}
@@ -19,10 +23,23 @@ export const Route = createRootRoute({
 function RootLayout() {
   return (
     <Providers>
+{% if use_app_shell %}
       <AppShellFrame />
+{% else %}
+      <div
+        className="flex h-screen flex-col overflow-hidden"
+        data-testid="app-shell.root"
+      >
+{% if use_sse %}
+        <DeploymentNotificationBar />
+{% endif %}
+        <Outlet />
+      </div>
+{% endif %}
     </Providers>
   );
 }
+{% if use_app_shell %}
 
 /**
  * App shell with top bar, sidebar, and main content area.
@@ -112,3 +129,4 @@ function AppShellFrame() {
     </div>
   );
 }
+{% endif %}

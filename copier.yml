@@ -57,6 +57,11 @@ use_sse:
   default: false
   help: "Include SSE context, SharedWorker, version tracking, deployment bar, task event hooks"
 
+use_app_shell:
+  type: bool
+  default: true
+  help: "Include the standard app shell (top bar, sidebar navigation). Disable for embedded/minimal apps that provide their own layout."
+
 # ── Files generated once, never overwritten ───────────────────────────
 
 _skip_if_exists:
@@ -92,6 +97,11 @@ _exclude:
   - "{% if not use_oidc %}src/components/auth{% endif %}"
   - "{% if not use_oidc %}src/components/layout/user-dropdown.tsx{% endif %}"
   - "{% if not use_oidc %}src/lib/auth-redirect.ts{% endif %}"
+
+  # App shell (sidebar + top bar)
+  - "{% if not use_app_shell %}src/components/layout/sidebar.tsx{% endif %}"
+  - "{% if not use_app_shell %}src/components/layout/sidebar-nav.ts{% endif %}"
+  - "{% if not use_app_shell %}src/components/layout/top-bar.tsx{% endif %}"
 
   # SSE
   - "{% if not use_sse %}src/contexts/sse-context.ts{% endif %}"
