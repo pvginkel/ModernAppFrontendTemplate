@@ -93,6 +93,8 @@ _skip_if_exists:
   # App-owned test extensions
   - "tests/support/fixtures.ts"
   - "tests/support/selectors-domain.ts"
+  # App-owned build pipeline
+  - "Jenkinsfile"
 
 # ── Feature-flagged file exclusion ────────────────────────────────────
 
