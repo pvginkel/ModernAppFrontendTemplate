@@ -158,6 +158,140 @@
         "title": "HealthResponse",
         "type": "object"
       },
+      "ItemCreate.9bf1f2e": {
+        "description": "Schema for creating an item.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Item description",
+            "title": "Description"
+          },
+          "name": {
+            "description": "Item name",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "quantity": {
+            "default": 0,
+            "description": "Item quantity",
+            "minimum": 0,
+            "title": "Quantity",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ItemCreate",
+        "type": "object"
+      },
+      "ItemResponse.9bf1f2e": {
+        "description": "Schema for item responses.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "quantity",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ItemResponse",
+        "type": "object"
+      },
+      "ItemUpdate.9bf1f2e": {
+        "description": "Schema for updating an item.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Item description",
+            "title": "Description"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Item name",
+            "title": "Name"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Item quantity",
+            "title": "Quantity"
+          }
+        },
+        "title": "ItemUpdate",
+        "type": "object"
+      },
       "TaskEventRequestSchema.6b6ce9f": {
         "description": "Request schema for sending fake task events in testing mode.",
         "properties": {
@@ -627,7 +761,38 @@
         "description": "",
         "operationId": "post__api_items",
         "parameters": [],
-        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemCreate.9bf1f2e"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemResponse.9bf1f2e"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError.6a07bef"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
         "summary": "Create a new item.",
         "tags": []
       }
@@ -686,7 +851,38 @@
             }
           }
         ],
-        "responses": {},
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemUpdate.9bf1f2e"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemResponse.9bf1f2e"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError.6a07bef"
+                }
+              }
+            },
+            "description": "Bad Request"
+          }
+        },
         "summary": "Update an item.",
         "tags": []
       }

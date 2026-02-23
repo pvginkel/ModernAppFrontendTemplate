@@ -99,6 +99,15 @@ The app customizes behavior through extension points:
 7. **Test fixtures** — extend `tests/support/fixtures-infrastructure.ts` in `tests/support/fixtures.ts`
 8. **Test selectors** — add domain selectors in `tests/support/selectors-domain.ts`
 
+## OpenAPI Spec Pipeline
+
+The frontend API client is generated from the backend's OpenAPI spec. **Never hand-edit the cached spec or generated types/hooks** — always fix the source:
+
+1. **Backend generates the spec** — Spectree decorators (`@api.validate()`) on Flask endpoints produce the OpenAPI schema at `/api/docs/openapi.json`. If an endpoint is missing `requestBody` or response types, add/fix the `@api.validate()` decorator in the backend blueprint.
+2. **Frontend fetches and caches** — `scripts/fetch-openapi.js` downloads the spec from the running backend and saves it to `openapi-cache/openapi.json`.
+3. **Code generation** — `scripts/generate-api.js` reads the cached spec and produces `src/lib/api/generated/{types.ts,hooks.ts,client.ts}`.
+4. **test-app-domain** — Pre-generated `types.ts` and `hooks.ts` in `test-app-domain/src/lib/api/generated/` must stay in sync with the cached spec. After updating the spec, regenerate (`bash regen.sh && pnpm run build`) and copy the freshly generated files back to `test-app-domain/`.
+
 ## Reference App
 
 Template patterns are extracted from: `/work/ElectronicsInventory/frontend/`

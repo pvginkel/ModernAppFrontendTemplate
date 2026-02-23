@@ -11,6 +11,9 @@ export type DeploymentTriggerRequestSchema_6b6ce9f = components['schemas']['Depl
 export type DeploymentTriggerResponseSchema_6b6ce9f = components['schemas']['DeploymentTriggerResponseSchema.6b6ce9f'];
 export type ForceErrorQuerySchema_e510e64 = components['schemas']['ForceErrorQuerySchema.e510e64'];
 export type HealthResponse_d817ae2 = components['schemas']['HealthResponse.d817ae2'];
+export type ItemCreate_9bf1f2e = components['schemas']['ItemCreate.9bf1f2e'];
+export type ItemResponse_9bf1f2e = components['schemas']['ItemResponse.9bf1f2e'];
+export type ItemUpdate_9bf1f2e = components['schemas']['ItemUpdate.9bf1f2e'];
 export type TaskEventRequestSchema_6b6ce9f = components['schemas']['TaskEventRequestSchema.6b6ce9f'];
 export type TaskEventResponseSchema_6b6ce9f = components['schemas']['TaskEventResponseSchema.6b6ce9f'];
 export type TaskStartRequestSchema_6b6ce9f = components['schemas']['TaskStartRequestSchema.6b6ce9f'];
@@ -132,12 +135,12 @@ export function useGetItems(params?: any, options?: Omit<Parameters<typeof useQu
 /**
  * Create a new item.
  */
-export function usePostItems(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<void, Error, { body: any }>> {
+export function usePostItems(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<ItemResponse_9bf1f2e, Error, { body: ItemCreate_9bf1f2e }>> {
   const queryClient = useQueryClient();
 
   // @ts-ignore
   return useMutation({
-    mutationFn: async (variables: { body: any }) => {
+    mutationFn: async (variables: { body: ItemCreate_9bf1f2e }) => {
       const result = await api.POST('/api/items' as const, { body: variables.body }) as { data?: unknown; error?: unknown; response: Response };
       if (result.error) throw toApiError(result.error, result.response.status);
       return result.data;
@@ -190,13 +193,13 @@ export function useGetItemsByItemId(params?: any, options?: Omit<Parameters<type
 /**
  * Update an item.
  */
-export function usePatchItemsByItemId(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<void, Error, { path: PatchItemsByItemIdParameters['path'] }>> {
+export function usePatchItemsByItemId(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<ItemResponse_9bf1f2e, Error, { path: PatchItemsByItemIdParameters['path']; body: ItemUpdate_9bf1f2e }>> {
   const queryClient = useQueryClient();
 
   // @ts-ignore
   return useMutation({
-    mutationFn: async (variables: { path: PatchItemsByItemIdParameters['path'] }) => {
-      const result = await api.PATCH('/api/items/{item_id}', { params: { path: variables.path } }) as { data?: unknown; error?: unknown; response: Response };
+    mutationFn: async (variables: { path: PatchItemsByItemIdParameters['path']; body: ItemUpdate_9bf1f2e }) => {
+      const result = await api.PATCH('/api/items/{item_id}', { params: { path: variables.path }, body: variables.body }) as { data?: unknown; error?: unknown; response: Response };
       if (result.error) throw toApiError(result.error, result.response.status);
       return result.data;
     },

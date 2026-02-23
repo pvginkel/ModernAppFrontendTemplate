@@ -66,6 +66,12 @@ echo "==> Copying domain E2E tests from test-app-domain..."
 mkdir -p test-app/tests/e2e/parallel
 cp test-app-domain/tests/e2e/parallel/worker-isolation.spec.ts test-app/tests/e2e/parallel/
 
+# Domain-specific infrastructure tests (depend on app routes/navigation)
+mkdir -p test-app/tests/infrastructure/shell
+cp test-app-domain/tests/infrastructure/shell/navigation.spec.ts test-app/tests/infrastructure/shell/
+cp test-app-domain/tests/infrastructure/shell/mobile-menu.spec.ts test-app/tests/infrastructure/shell/
+cp test-app-domain/tests/infrastructure/auth/auth-shell-home.spec.ts test-app/tests/infrastructure/auth/
+
 # Test environment overrides (e.g. BACKEND_ROOT for the template's directory layout)
 cp .env.test test-app/.env.test
 

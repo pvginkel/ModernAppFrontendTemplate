@@ -631,6 +631,77 @@ export interface components {
             status: string;
         };
         /**
+         * ItemCreate
+         * @description Schema for creating an item.
+         */
+        "ItemCreate.9bf1f2e": {
+            /**
+             * Description
+             * @description Item description
+             * @default null
+             */
+            description: string | null;
+            /**
+             * Name
+             * @description Item name
+             */
+            name: string;
+            /**
+             * Quantity
+             * @description Item quantity
+             * @default 0
+             */
+            quantity: number;
+        };
+        /**
+         * ItemResponse
+         * @description Schema for item responses.
+         */
+        "ItemResponse.9bf1f2e": {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Description */
+            description: string | null;
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Quantity */
+            quantity: number;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * ItemUpdate
+         * @description Schema for updating an item.
+         */
+        "ItemUpdate.9bf1f2e": {
+            /**
+             * Description
+             * @description Item description
+             * @default null
+             */
+            description: string | null;
+            /**
+             * Name
+             * @description Item name
+             * @default null
+             */
+            name: string | null;
+            /**
+             * Quantity
+             * @description Item quantity
+             * @default null
+             */
+            quantity: number | null;
+        };
+        /**
          * TaskEventRequestSchema
          * @description Request schema for sending fake task events in testing mode.
          */
@@ -952,8 +1023,31 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
-        responses: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemCreate.9bf1f2e"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemResponse.9bf1f2e"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError.6a07bef"];
+                };
+            };
+        };
     };
     "get__api_items_{item_id}": {
         parameters: {
@@ -988,8 +1082,31 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
-        responses: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ItemUpdate.9bf1f2e"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemResponse.9bf1f2e"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError.6a07bef"];
+                };
+            };
+        };
     };
     post__api_sse_callback: {
         parameters: {
