@@ -127,6 +127,7 @@ _exclude:
   - "{% if not use_sse %}src/lib/config/sse-request-id.ts{% endif %}"
   - "{% if not use_sse %}src/workers{% endif %}"
   - "{% if not use_sse %}src/components/primitives/deployment-notification-bar.tsx{% endif %}"
+  - "{% if not use_sse %}src/components/sse{% endif %}"
   - "{% if not use_sse %}tests/support/helpers/deployment-sse.ts{% endif %}"
   - "{% if not use_sse %}tests/support/helpers/deployment-reset.ts{% endif %}"
 
