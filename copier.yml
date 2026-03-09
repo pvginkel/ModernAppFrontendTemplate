@@ -82,11 +82,6 @@ validation_image_name:
   default: "registry:5000/{{ project_name }}-validation"
   help: "Validation Docker image name"
 
-validation_credential_id:
-  type: str
-  default: ""
-  help: "Jenkins secret file credential ID for test env vars (empty = no secrets)"
-
 use_oidc:
   type: bool
   default: false
