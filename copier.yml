@@ -52,6 +52,41 @@ image_name:
   default: "registry:5000/{{ project_name }}"
   help: "Docker image name (used in Jenkinsfile and build scripts)"
 
+backend_repo_url:
+  type: str
+  default: ""
+  help: "Backend git repository URL (for cloning in validation)"
+
+backend_image_name:
+  type: str
+  default: ""
+  help: "Backend Docker image name (for crane tag promotion in validation)"
+
+backend_jenkins_job:
+  type: str
+  default: ""
+  help: "Backend Jenkins job name (for copyArtifacts in validation)"
+
+frontend_jenkins_job:
+  type: str
+  default: ""
+  help: "Frontend Jenkins job name (for copyArtifacts in validation)"
+
+validation_jenkins_job:
+  type: str
+  default: ""
+  help: "Jenkins validation job to trigger after build (empty = old build+deploy flow)"
+
+validation_image_name:
+  type: str
+  default: "registry:5000/{{ project_name }}-validation"
+  help: "Validation Docker image name"
+
+validation_credential_id:
+  type: str
+  default: ""
+  help: "Jenkins secret file credential ID for test env vars (empty = no secrets)"
+
 use_oidc:
   type: bool
   default: false
@@ -95,6 +130,9 @@ _skip_if_exists:
   - "tests/support/selectors-domain.ts"
   # App-owned build pipeline
   - "Jenkinsfile"
+  - "Jenkinsfile.validation"
+  - "Dockerfile.validation"
+  - "scripts/validation-entrypoint.sh"
 
 # ── Feature-flagged file exclusion ────────────────────────────────────
 
@@ -112,6 +150,11 @@ _exclude:
   - "{% if not use_app_shell %}src/components/layout/sidebar-nav.ts{% endif %}"
   - "{% if not use_app_shell %}src/components/layout/top-bar.tsx{% endif %}"
   - "{% if not use_app_shell %}tests/infrastructure/auth/auth-shell.spec.ts{% endif %}"
+
+  # Validation pipeline (excluded when not enabled)
+  - "{% if not validation_jenkins_job %}Jenkinsfile.validation{% endif %}"
+  - "{% if not validation_jenkins_job %}Dockerfile.validation{% endif %}"
+  - "{% if not validation_jenkins_job %}scripts/validation-entrypoint.sh{% endif %}"
 
   # SSE
   - "{% if not use_sse %}src/contexts/sse-context.ts{% endif %}"
