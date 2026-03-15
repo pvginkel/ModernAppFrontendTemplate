@@ -97,6 +97,11 @@ use_app_shell:
   default: true
   help: "Include the standard app shell (top bar, sidebar navigation). Disable for embedded/minimal apps that provide their own layout."
 
+generate_validation_pipeline:
+  type: bool
+  default: true
+  help: "Generate Jenkinsfile.validation, Dockerfile.validation, and validation-entrypoint.sh. Disable when validation is managed in a separate repo (e.g. a project-level monorepo)."
+
 # ── Files generated once, never overwritten ───────────────────────────
 
 _skip_if_exists:
@@ -146,10 +151,10 @@ _exclude:
   - "{% if not use_app_shell %}src/components/layout/top-bar.tsx{% endif %}"
   - "{% if not use_app_shell %}tests/infrastructure/auth/auth-shell.spec.ts{% endif %}"
 
-  # Validation pipeline (excluded when not enabled)
-  - "{% if not validation_jenkins_job %}Jenkinsfile.validation{% endif %}"
-  - "{% if not validation_jenkins_job %}Dockerfile.validation{% endif %}"
-  - "{% if not validation_jenkins_job %}scripts/validation-entrypoint.sh{% endif %}"
+  # Validation pipeline (excluded when no validation job or generation disabled)
+  - "{% if not validation_jenkins_job or not generate_validation_pipeline %}Jenkinsfile.validation{% endif %}"
+  - "{% if not validation_jenkins_job or not generate_validation_pipeline %}Dockerfile.validation{% endif %}"
+  - "{% if not validation_jenkins_job or not generate_validation_pipeline %}scripts/validation-entrypoint.sh{% endif %}"
 
   # SSE
   - "{% if not use_sse %}src/contexts/sse-context.ts{% endif %}"
