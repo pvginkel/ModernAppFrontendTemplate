@@ -14,8 +14,9 @@ const CACHE_DIR = path.join(__dirname, '../openapi-cache');
 const CACHE_FILE = path.join(CACHE_DIR, 'openapi.json');
 
 // Primary and fallback URLs for fetching OpenAPI spec
+const BACKEND_PORT = process.env.PORT || '5000';
 const OPENAPI_URLS = [
-  'http://localhost:5000/api/docs/openapi.json'
+  `http://localhost:${BACKEND_PORT}/api/docs/openapi.json`
 ];
 
 /**
