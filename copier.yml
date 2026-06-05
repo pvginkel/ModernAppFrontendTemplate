@@ -77,11 +77,6 @@ validation_jenkins_job:
   default: ""
   help: "Jenkins validation job to trigger after build (empty = old build+deploy flow)"
 
-validation_image_name:
-  type: str
-  default: "registry:5000/{{ project_name }}-validation"
-  help: "Validation Docker image name"
-
 use_oidc:
   type: bool
   default: false
@@ -100,7 +95,7 @@ use_app_shell:
 generate_validation_pipeline:
   type: bool
   default: true
-  help: "Generate Jenkinsfile.validation, Dockerfile.validation, and validation-entrypoint.sh. Disable when validation is managed in a separate repo (e.g. a project-level monorepo)."
+  help: "Generate Jenkinsfile.validation and validation-entrypoint.sh. Disable when validation is managed in a separate repo (e.g. a project-level monorepo)."
 
 # ── Files generated once, never overwritten ───────────────────────────
 
@@ -131,7 +126,6 @@ _skip_if_exists:
   # App-owned build pipeline
   - "Jenkinsfile"
   - "Jenkinsfile.validation"
-  - "Dockerfile.validation"
   - "scripts/validation-entrypoint.sh"
 
 # ── Feature-flagged file exclusion ────────────────────────────────────
@@ -153,7 +147,6 @@ _exclude:
 
   # Validation pipeline (excluded when no validation job or generation disabled)
   - "{% if not validation_jenkins_job or not generate_validation_pipeline %}Jenkinsfile.validation{% endif %}"
-  - "{% if not validation_jenkins_job or not generate_validation_pipeline %}Dockerfile.validation{% endif %}"
   - "{% if not validation_jenkins_job or not generate_validation_pipeline %}scripts/validation-entrypoint.sh{% endif %}"
 
   # SSE
