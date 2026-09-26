@@ -27,11 +27,6 @@ author_email:
   type: str
   help: "Author email for package.json"
 
-repo_url:
-  type: str
-  default: ""
-  help: "Git repository URL"
-
 backend_port:
   type: int
   default: 5000
@@ -46,36 +41,6 @@ frontend_port:
   type: int
   default: 3000
   help: "Vite dev server port"
-
-image_name:
-  type: str
-  default: "registry:5000/{{ project_name }}"
-  help: "Docker image name (used in Jenkinsfile and build scripts)"
-
-backend_repo_url:
-  type: str
-  default: ""
-  help: "Backend git repository URL (for cloning in validation)"
-
-backend_image_name:
-  type: str
-  default: ""
-  help: "Backend Docker image name (for crane tag promotion in validation)"
-
-backend_jenkins_job:
-  type: str
-  default: ""
-  help: "Backend Jenkins job name (for copyArtifacts in validation)"
-
-frontend_jenkins_job:
-  type: str
-  default: ""
-  help: "Frontend Jenkins job name (for copyArtifacts in validation)"
-
-validation_jenkins_job:
-  type: str
-  default: ""
-  help: "Jenkins validation job to trigger after build (empty = old build+deploy flow)"
 
 use_oidc:
   type: bool
@@ -92,11 +57,6 @@ use_app_shell:
   default: true
   help: "Include the standard app shell (top bar, sidebar navigation). Disable for embedded/minimal apps that provide their own layout."
 
-generate_validation_pipeline:
-  type: bool
-  default: true
-  help: "Generate Jenkinsfile.validation and validation-entrypoint.sh. Disable when validation is managed in a separate repo (e.g. a project-level monorepo)."
-
 # ── Files generated once, never overwritten ───────────────────────────
 
 _skip_if_exists:
@@ -106,6 +66,7 @@ _skip_if_exists:
   - "package.json"
   - ".env.example"
   - "public/favicon.png"
+  - ".dockerignore"
   # App-owned styling (theme + variant configs)
   - "src/styles/app-theme.css"
   - "src/styles/button.ts"
@@ -123,10 +84,6 @@ _skip_if_exists:
   # App-owned test extensions
   - "tests/support/fixtures.ts"
   - "tests/support/selectors-domain.ts"
-  # App-owned build pipeline
-  - "Jenkinsfile"
-  - "Jenkinsfile.validation"
-  - "scripts/validation-entrypoint.sh"
 
 # ── Feature-flagged file exclusion ────────────────────────────────────
 
@@ -144,10 +101,6 @@ _exclude:
   - "{% if not use_app_shell %}src/components/layout/sidebar-nav.ts{% endif %}"
   - "{% if not use_app_shell %}src/components/layout/top-bar.tsx{% endif %}"
   - "{% if not use_app_shell %}tests/infrastructure/auth/auth-shell.spec.ts{% endif %}"
-
-  # Validation pipeline (excluded when no validation job or generation disabled)
-  - "{% if not validation_jenkins_job or not generate_validation_pipeline %}Jenkinsfile.validation{% endif %}"
-  - "{% if not validation_jenkins_job or not generate_validation_pipeline %}scripts/validation-entrypoint.sh{% endif %}"
 
   # SSE
   - "{% if not use_sse %}src/contexts/sse-context.ts{% endif %}"

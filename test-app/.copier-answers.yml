@@ -1,22 +1,14 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: v0.19.1-1-g582f4ab
+_commit: v0.19.1-2-g966e7d6
 _src_path: .
 author_email: test@example.com
 author_name: Test Author
-backend_image_name: ''
-backend_jenkins_job: ''
 backend_port: 5000
-backend_repo_url: ''
-frontend_jenkins_job: ''
 frontend_port: 3000
-generate_validation_pipeline: true
-image_name: registry:5000/test-app
 project_description: Test application
 project_name: test-app
 project_title: Test App
-repo_url: https://github.com/test/test-app.git
 sse_gateway_port: 3001
 use_app_shell: true
 use_oidc: true
 use_sse: true
-validation_jenkins_job: ''
