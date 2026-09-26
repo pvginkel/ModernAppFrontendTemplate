@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- the tab-preference helpers and useRestoreTab belong with RoutedTabs */
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { type ReactNode, useEffect } from 'react'
 
