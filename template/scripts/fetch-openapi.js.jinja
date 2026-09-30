@@ -82,7 +82,7 @@ function calculateSpecHash(spec) {
 }
 
 /**
- * Loads cached OpenAPI spec and metadata
+ * Loads the cached OpenAPI spec
  */
 function loadCache() {
   try {
@@ -94,7 +94,7 @@ function loadCache() {
 }
 
 /**
- * Saves OpenAPI spec and metadata to cache
+ * Saves the OpenAPI spec to the cache
  */
 function saveCache(spec) {
   // Save the spec (a fresh app has no openapi-cache/ yet)
@@ -123,18 +123,19 @@ export async function fetchAndCache(options = {}) {
   
   // Check if we should use cache
   if (!forceRefresh) {
-    const cache = loadCache();
-    if (cache) {
-      console.log(`📦 Found cached OpenAPI spec from ${cache.timestamp} (hash: ${cache.hash})`);
+    const cachedSpec = loadCache();
+    if (cachedSpec) {
+      const cachedHash = calculateSpecHash(cachedSpec);
+      console.log(`📦 Found cached OpenAPI spec (hash: ${cachedHash})`);
       
       // Try to fetch to check for changes
       try {
         const freshSpec = await fetchOpenAPISpec();
         const freshHash = calculateSpecHash(freshSpec);
         
-        if (freshHash === cache.hash) {
+        if (freshHash === cachedHash) {
           console.log('✅ OpenAPI spec is up to date, using cache');
-          return cache.spec;
+          return cachedSpec;
         } else {
           console.log('🔄 OpenAPI spec has changed, updating cache');
           saveCache(freshSpec);
@@ -142,7 +143,7 @@ export async function fetchAndCache(options = {}) {
         }
       } catch (error) {
         console.log(`⚠️  Failed to fetch fresh spec, using cache: ${error.message}`);
-        return cache.spec;
+        return cachedSpec;
       }
     }
   }
