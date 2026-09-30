@@ -79,6 +79,8 @@ _skip_if_exists:
   - "src/styles/index.ts"
   # App-owned UI re-exports (apps add their own components here)
   - "src/components/ui/index.ts"
+  # App-owned home route (a placeholder the app replaces)
+  - "src/routes/index.tsx"
   # App-owned Vite proxy extensions
   - "vite-proxy-extensions.ts"
   # App-owned test extensions

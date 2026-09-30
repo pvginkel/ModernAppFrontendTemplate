@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { writeFileSync, readFileSync } from 'fs';
+import { writeFileSync, readFileSync, mkdirSync } from 'fs';
 import { createHash } from 'crypto';
 import https from 'https';
 import http from 'http';
@@ -97,7 +97,8 @@ function loadCache() {
  * Saves OpenAPI spec and metadata to cache
  */
 function saveCache(spec) {
-  // Save the spec
+  // Save the spec (a fresh app has no openapi-cache/ yet)
+  mkdirSync(CACHE_DIR, { recursive: true });
   writeFileSync(CACHE_FILE, JSON.stringify(spec, null, 2));
   
   console.log(`✅ Cached OpenAPI spec`);

@@ -73,6 +73,7 @@ Infrastructure code — config, core source, providers, contexts, hooks, lib, co
 - `src/styles/*.ts` — component variant configs (button, alert, card, toast, input, etc.)
 - `src/components/ui/index.ts` — re-exports; the template's own ui components are template-owned since v0.18.0
 - `src/components/layout/sidebar-nav.ts` — app-specific navigation items
+- `src/routes/index.tsx` — placeholder home page (a fresh app needs a route besides `__root`)
 - `tests/support/fixtures.ts` — extends infrastructure with domain page objects
 - `tests/support/selectors-domain.ts` — domain-specific selectors
 - `package.json` — dependencies (app manages after generation)
