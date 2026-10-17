@@ -160,8 +160,8 @@ test.describe('SSE connectivity', () => {
           });
         });
 
-        // Small delay to ensure the Gateway callback has registered the connection
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // No wait for the backend: the gateway opens the stream only after the
+        // backend's connect callback has registered the connection.
 
         // Send a fake task event to our request_id via the backend testing API.
         // Uses relative URL so the request goes through the Vite proxy.
@@ -246,8 +246,6 @@ test.describe('SSE connectivity', () => {
             }
           });
         });
-
-        await new Promise(resolve => setTimeout(resolve, 500));
 
         const sendResponse = await fetch('/api/testing/sse/task-event', {
           method: 'POST',

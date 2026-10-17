@@ -12,6 +12,7 @@ export interface DeploymentSseHelper {
   ensureConnected: (options?: { timeout?: number }) => Promise<DeploymentSseStatus>;
   getStatus: () => Promise<DeploymentSseStatus>;
   getRequestId: () => Promise<string | null>;
+  waitForCurrentVersion: (version: string, options?: { timeout?: number }) => Promise<void>;
   resetRequestId: () => Promise<void>;
 }
 
@@ -116,6 +117,23 @@ export function createDeploymentSseHelper(page: Page): DeploymentSseHelper {
     });
   };
 
+  // The deployment provider takes the first version it receives as the
+  // current one, and only a different version raises the banner. A spec that
+  // sends a baseline and then a newer version waits here in between, or the
+  // provider can take the newer one as its first.
+  const waitForCurrentVersion = async (
+    version: string,
+    options?: { timeout?: number }
+  ): Promise<void> => {
+    const timeout = options?.timeout ?? DEFAULT_CONNECTION_TIMEOUT;
+    await waitForBridge(timeout);
+    await page.waitForFunction(
+      expected => window.__deploymentSseControls?.getCurrentVersion() === expected,
+      version,
+      { timeout }
+    );
+  };
+
   const resetRequestId = async (): Promise<void> => {
     await resetDeploymentRequestId(page);
   };
@@ -126,6 +144,7 @@ export function createDeploymentSseHelper(page: Page): DeploymentSseHelper {
     ensureConnected,
     getStatus,
     getRequestId,
+    waitForCurrentVersion,
     resetRequestId,
   };
 }

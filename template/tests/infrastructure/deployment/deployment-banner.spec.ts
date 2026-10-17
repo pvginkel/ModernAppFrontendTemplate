@@ -61,7 +61,9 @@ test('surfaces backend-driven deployment updates', async ({
       timeoutMs: 30000,
     });
 
-    await page.waitForTimeout(200);
+    // The banner compares a version with the first one the app received;
+    // wait until the baseline is that one before sending the next.
+    await deploymentSse.waitForCurrentVersion(baselineVersion);
 
     const triggerResponse = await page.request.post(`${backendUrl}/api/testing/deployments/version`, {
       data: {

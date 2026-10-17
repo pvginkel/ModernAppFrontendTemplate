@@ -27,6 +27,7 @@ type PlaywrightDeploymentSseControls = TestModeEnabled extends true
       disconnect: () => void;
       getStatus: () => DeploymentSseStatus;
       getRequestId: () => string | null;
+      getCurrentVersion: () => string | null;
     }
   : never;
 
