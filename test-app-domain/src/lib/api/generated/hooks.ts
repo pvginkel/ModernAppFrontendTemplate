@@ -10,10 +10,13 @@ export type ContentImageQuerySchema_7ccab41 = components['schemas']['ContentImag
 export type DeploymentTriggerRequestSchema_6b6ce9f = components['schemas']['DeploymentTriggerRequestSchema.6b6ce9f'];
 export type DeploymentTriggerResponseSchema_6b6ce9f = components['schemas']['DeploymentTriggerResponseSchema.6b6ce9f'];
 export type ForceErrorQuerySchema_e510e64 = components['schemas']['ForceErrorQuerySchema.e510e64'];
+export type ForceSSECallbackErrorQuerySchema_6b6ce9f = components['schemas']['ForceSSECallbackErrorQuerySchema.6b6ce9f'];
 export type HealthResponse_d817ae2 = components['schemas']['HealthResponse.d817ae2'];
 export type ItemCreate_9bf1f2e = components['schemas']['ItemCreate.9bf1f2e'];
 export type ItemResponse_9bf1f2e = components['schemas']['ItemResponse.9bf1f2e'];
 export type ItemUpdate_9bf1f2e = components['schemas']['ItemUpdate.9bf1f2e'];
+export type ReadyzResponse_d817ae2 = components['schemas']['ReadyzResponse.d817ae2'];
+export type ReadyzResponse_d817ae2_ReadinessCheckSchema = components['schemas']['ReadyzResponse.d817ae2.ReadinessCheckSchema'];
 export type TaskEventRequestSchema_6b6ce9f = components['schemas']['TaskEventRequestSchema.6b6ce9f'];
 export type TaskEventResponseSchema_6b6ce9f = components['schemas']['TaskEventResponseSchema.6b6ce9f'];
 export type TaskStartRequestSchema_6b6ce9f = components['schemas']['TaskStartRequestSchema.6b6ce9f'];
@@ -21,6 +24,7 @@ export type TaskStartResponseSchema_6b6ce9f = components['schemas']['TaskStartRe
 export type TestErrorResponseSchema_6b6ce9f = components['schemas']['TestErrorResponseSchema.6b6ce9f'];
 export type TestSessionCreateSchema_e510e64 = components['schemas']['TestSessionCreateSchema.e510e64'];
 export type TestSessionResponseSchema_e510e64 = components['schemas']['TestSessionResponseSchema.e510e64'];
+export type UiSetupResponseSchema_630d3b9 = components['schemas']['UiSetupResponseSchema.630d3b9'];
 export type UserInfoResponseSchema_a535b8c = components['schemas']['UserInfoResponseSchema.a535b8c'];
 export type ValidationError_6a07bef = components['schemas']['ValidationError.6a07bef'];
 export type ValidationError_6a07bef_ValidationErrorElement = components['schemas']['ValidationError.6a07bef.ValidationErrorElement'];
@@ -35,6 +39,7 @@ export type PostTestingAuthForceErrorParameters = paths['/api/testing/auth/force
 export type GetTestingContentHtmlParameters = paths['/api/testing/content/html']['get']['parameters'];
 export type GetTestingContentHtmlWithBannerParameters = paths['/api/testing/content/html-with-banner']['get']['parameters'];
 export type GetTestingContentImageParameters = paths['/api/testing/content/image']['get']['parameters'];
+export type PostTestingSseForceCallbackErrorParameters = paths['/api/testing/sse/force-callback-error']['post']['parameters'];
 
 /**
  * Handle OIDC callback after user authorization.
@@ -455,6 +460,27 @@ export function useGetTestingLogsStream(params?: any, options?: Omit<Parameters<
 }
 
 /**
+ * Make the next SSE Gateway connect callback refuse the connection.
+ */
+export function usePostTestingSseForceCallbackError(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<void, Error, { query: PostTestingSseForceCallbackErrorParameters['query'] }>> {
+  const queryClient = useQueryClient();
+
+  // @ts-ignore
+  return useMutation({
+    mutationFn: async (variables: { query: PostTestingSseForceCallbackErrorParameters['query'] }) => {
+      const result = await api.POST('/api/testing/sse/force-callback-error' as const, { params: { query: variables.query } }) as { data?: unknown; error?: unknown; response: Response };
+      if (result.error) throw toApiError(result.error, result.response.status);
+      return result.data;
+    },
+    onSuccess: () => {
+      // Invalidate relevant queries after successful mutation
+      queryClient.invalidateQueries();
+    },
+    ...options
+  });
+}
+
+/**
  * Send a fake task event to a specific SSE connection for testing.
  */
 export function usePostTestingSseTaskEvent(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<TaskEventResponseSchema_6b6ce9f, Error, { body: TaskEventRequestSchema_6b6ce9f }>> {
@@ -497,6 +523,22 @@ export function usePostTestingTasksStart(options?: Omit<Parameters<typeof useMut
 }
 
 /**
+ * Return the deployment stage, and whether the UI may show internal detail.
+ */
+export function useGetUiSetup(params?: any, options?: Omit<Parameters<typeof useQuery>[0], 'queryKey' | 'queryFn'>): ReturnType<typeof useQuery<UiSetupResponseSchema_630d3b9>> {
+  // @ts-ignore
+  return useQuery({
+    queryKey: ['getUiSetup', params],
+    queryFn: async () => {
+      const result = await api.GET('/api/ui-setup' as const, { params }) as { data?: unknown; error?: unknown; response: Response };
+      if (result.error) throw toApiError(result.error, result.response.status);
+      return result.data;
+    },
+    ...options
+  });
+}
+
+/**
  * Drain endpoint for manual graceful shutdown initiation.
  */
 export function useGetHealthDrain(params?: any, options?: Omit<Parameters<typeof useQuery>[0], 'queryKey' | 'queryFn'>): ReturnType<typeof useQuery<HealthResponse_d817ae2>> {
@@ -531,7 +573,7 @@ export function useGetHealthHealthz(params?: any, options?: Omit<Parameters<type
 /**
  * Readiness probe endpoint for Kubernetes.
  */
-export function useGetHealthReadyz(params?: any, options?: Omit<Parameters<typeof useQuery>[0], 'queryKey' | 'queryFn'>): ReturnType<typeof useQuery<HealthResponse_d817ae2>> {
+export function useGetHealthReadyz(params?: any, options?: Omit<Parameters<typeof useQuery>[0], 'queryKey' | 'queryFn'>): ReturnType<typeof useQuery<ReadyzResponse_d817ae2>> {
   // @ts-ignore
   return useQuery({
     queryKey: ['getHealthReadyz', params],

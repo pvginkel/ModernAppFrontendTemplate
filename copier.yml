@@ -102,7 +102,9 @@ _exclude:
   - "{% if not use_app_shell %}src/components/layout/sidebar.tsx{% endif %}"
   - "{% if not use_app_shell %}src/components/layout/sidebar-nav.ts{% endif %}"
   - "{% if not use_app_shell %}src/components/layout/top-bar.tsx{% endif %}"
+  - "{% if not use_app_shell %}src/components/layout/stage-indicator.tsx{% endif %}"
   - "{% if not use_app_shell %}tests/infrastructure/auth/auth-shell.spec.ts{% endif %}"
+  - "{% if not use_app_shell %}tests/infrastructure/shell/stage-indicator.spec.ts{% endif %}"
 
   # SSE
   - "{% if not use_sse %}src/contexts/sse-context.ts{% endif %}"

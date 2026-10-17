@@ -37,9 +37,9 @@ export interface paths {
         };
         /**
          * Initiate OIDC login flow with PKCE.
-         * @description Generates authorization URL and redirects to OIDC provider. Stores PKCE state in signed cookie.
+         * @description Generates authorization URL and redirects to OIDC provider. PKCE state is encrypted into the OAuth state parameter. The ``redirect_uri`` is the callback on the origin the request came in on, so the app signs in on every hostname it is served on (each one registered at the IdP).
          *
-         *     Query Parameters:     redirect: URL to redirect to after successful login (required)
+         *     Query Parameters:     redirect: Path to redirect to after successful login (required)
          *
          *     Returns:     302: Redirect to OIDC provider authorization endpoint     400: Missing or invalid redirect parameter
          */
@@ -63,9 +63,9 @@ export interface paths {
          * Log out current user.
          * @description Clears access token cookie and redirects to OIDC provider's logout endpoint to terminate the session at the IdP level.
          *
-         *     Query Parameters:     redirect: URL to redirect to after logout (default: /)
+         *     Query Parameters:     redirect: Path to redirect to after logout (default: /)
          *
-         *     Returns:     302: Redirect to OIDC logout endpoint (or direct redirect if OIDC disabled)
+         *     Returns:     302: Redirect to OIDC logout endpoint (or direct redirect if OIDC disabled)     400: Invalid redirect parameter
          */
         get: operations["get__api_auth_logout"];
         put?: never;
@@ -85,9 +85,9 @@ export interface paths {
         };
         /**
          * Get current authenticated user information.
-         * @description This endpoint is @public because it handles authentication explicitly: in testing mode it checks test sessions and forced errors; otherwise it validates tokens or returns a default local-user when OIDC is off.
+         * @description This endpoint is @public, so the request hook resolves the caller (refreshing an expired access token) without answering 401 itself, and the handler answers 401 when no one is signed in. A caller with none of the app's roles gets 403 from the hook. With OIDC disabled, the caller is the local admin.
          *
-         *     Returns:     200: User information from validated token or test session     401: No valid token provided or token invalid
+         *     Returns:     200: User information     401: No valid token provided or token invalid     403: User authenticated but has none of the app's roles
          */
         get: operations["get__api_auth_self"];
         put?: never;
@@ -172,7 +172,9 @@ export interface paths {
          * Handle SSE Gateway connect/disconnect callbacks.
          * @description This endpoint receives callbacks from the SSE Gateway when clients connect or disconnect. It extracts the request_id from the callback URL and calls SSEConnectionManager, which then notifies observers.
          *
-         *     Returns:     200 on success     401 if authentication fails (production only)     400 if payload invalid or request_id missing
+         *     A connect is accepted only for a caller the API would serve, and is refused before it is registered, so a refused stream never receives an event and never counts in the connection metrics. The gateway turns a refusal into an in-stream ``rejected`` event and ends the stream.
+         *
+         *     Returns:     200 on success     401 if the callback secret fails (production only), or the         forwarded token is missing or invalid     403 if the caller holds none of the app's roles (or lacks the         read role, where one is set)     400 if payload invalid or request_id missing
          */
         post: operations["post__api_sse_callback"];
         delete?: never;
@@ -394,11 +396,35 @@ export interface paths {
          * SSE endpoint for streaming backend application logs in real-time.
          * @description Streams logs from all loggers at INFO level and above. Each log entry is formatted as structured JSON with correlation ID when available.
          *
-         *     Event Types:     - log: Application log entries     - connection_open: Sent when client connects     - heartbeat: Sent every 30 seconds for keepalive     - connection_close: Sent when server shuts down
+         *     Event Types:     - log: Application log entries     - connection_open: Sent when client connects     - heartbeat: Sent every 30 seconds for keepalive
          */
         get: operations["get__api_testing_logs_stream"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/testing/sse/force-callback-error": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Make the next SSE Gateway connect callback refuse the connection.
+         * @description Single-shot: the callback after it behaves normally again. The gateway turns the refusal into an in-stream ``rejected`` event, which drives the frontend's refresh-and-reconnect path.
+         *
+         *     Query Parameters:     status: 401 or 403 (the schema refuses anything else with 400)
+         *
+         *     Returns:     204: Hook armed
+         */
+        post: operations["post__api_testing_sse_force-callback-error"];
         delete?: never;
         options?: never;
         head?: never;
@@ -436,6 +462,23 @@ export interface paths {
         put?: never;
         /** Start a demo or failing task for integration testing. */
         post: operations["post__api_testing_tasks_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ui-setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Return the deployment stage, and whether the UI may show internal detail. */
+        get: operations["get__api_ui-setup"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -491,7 +534,7 @@ export interface paths {
         };
         /**
          * Readiness probe endpoint for Kubernetes.
-         * @description Returns 503 when the application is shutting down, or any registered readiness check fails. This signals Kubernetes to remove the pod from service endpoints.
+         * @description Reports every registered check. Returns 503 when the application is shutting down or a critical check fails, which signals Kubernetes to remove the pod from service endpoints; a failing non-critical check leaves it in service (status "degraded").
          */
         get: operations["get__health_readyz"];
         put?: never;
@@ -610,8 +653,20 @@ export interface components {
             status: number;
         };
         /**
+         * ForceSSECallbackErrorQuerySchema
+         * @description Query parameters for /api/testing/sse/force-callback-error.
+         */
+        "ForceSSECallbackErrorQuerySchema.6b6ce9f": {
+            /**
+             * Status
+             * @description HTTP status the next SSE connect callback refuses with (401 or 403).
+             * @enum {integer}
+             */
+            status: 401 | 403;
+        };
+        /**
          * HealthResponse
-         * @description Health check response.
+         * @description Liveness and drain response.
          */
         "HealthResponse.d817ae2": {
             /**
@@ -624,9 +679,8 @@ export interface components {
             /**
              * Status
              * @description Health status message
-             * @example ready
              * @example alive
-             * @example shutting down
+             * @example unauthorized
              */
             status: string;
         };
@@ -700,6 +754,63 @@ export interface components {
              * @default null
              */
             quantity?: number | null;
+        };
+        /**
+         * ReadyzResponse
+         * @description Readiness response: the overall verdict and every check.
+         */
+        "ReadyzResponse.d817ae2": {
+            /**
+             * Checks
+             * @description Every registered check by name; empty while shutting down
+             */
+            checks: {
+                [key: string]: components["schemas"]["ReadyzResponse.d817ae2.ReadinessCheckSchema"];
+            };
+            /**
+             * Ready
+             * @description Whether the service takes traffic; false exactly when readyz answers 503
+             */
+            ready: boolean;
+            /**
+             * Stage
+             * @description Deployment stage (STAGE)
+             * @example prd
+             * @example local-dev
+             */
+            stage: string;
+            /**
+             * Status
+             * @description ok: every check passed. degraded: a non-critical check failed (200). not_ready: a critical check failed (503). shutting_down: draining (503).
+             * @enum {string}
+             */
+            status: "ok" | "degraded" | "not_ready" | "shutting_down";
+        };
+        /**
+         * ReadinessCheckSchema
+         * @description Result of one readiness check.
+         */
+        "ReadyzResponse.d817ae2.ReadinessCheckSchema": {
+            /**
+             * Critical
+             * @description Whether a failure of this check makes readyz answer 503
+             */
+            critical: boolean;
+            /**
+             * Detail
+             * @description Why the check failed, or a note on its result
+             * @default null
+             * @example connection failed
+             * @example 2 migrations pending
+             * @example timed out after 0.8 s
+             */
+            detail?: string | null;
+            /**
+             * Status
+             * @description ok, error, or disabled (deliberately not configured; never fails readiness)
+             * @enum {string}
+             */
+            status: "ok" | "error" | "disabled";
         };
         /**
          * TaskEventRequestSchema
@@ -882,6 +993,25 @@ export interface components {
             subject: string;
         };
         /**
+         * UiSetupResponseSchema
+         * @description What the frontend needs to know about the deployment it runs against.
+         */
+        "UiSetupResponseSchema.630d3b9": {
+            /**
+             * Expose Internals
+             * @description Whether the app may show internal detail, such as exception text and diagnostics: STAGE is not prd, or the app is marked HOMELAB_INTERNAL
+             */
+            expose_internals: boolean;
+            /**
+             * Stage
+             * @description Deployment stage (STAGE)
+             * @example prd
+             * @example local-dev
+             * @enum {string}
+             */
+            stage: "local-dev" | "dev" | "uat" | "prd" | "local-tst" | "tst";
+        };
+        /**
          * UserInfoResponseSchema
          * @description Response schema for current user information.
          */
@@ -917,8 +1047,13 @@ export interface components {
          * @description Model of a validation error response element.
          */
         "ValidationError.6a07bef.ValidationErrorElement": {
-            /** Error context */
-            ctx?: Record<string, never>;
+            /**
+             * Error context
+             * @default null
+             */
+            ctx?: {
+                [key: string]: unknown;
+            } | null;
             /** Missing field name */
             loc: string[];
             /** Error message */
@@ -1302,6 +1437,19 @@ export interface operations {
         requestBody?: never;
         responses: never;
     };
+    "post__api_testing_sse_force-callback-error": {
+        parameters: {
+            query: {
+                /** @description HTTP status the next SSE connect callback refuses with (401 or 403). */
+                status: 401 | 403;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
+    };
     "post__api_testing_sse_task-event": {
         parameters: {
             query?: never;
@@ -1355,6 +1503,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TaskStartResponseSchema.6b6ce9f"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError.6a07bef"];
+                };
+            };
+        };
+    };
+    "get__api_ui-setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UiSetupResponseSchema.630d3b9"];
                 };
             };
             /** @description Bad Request */
@@ -1450,7 +1627,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HealthResponse.d817ae2"];
+                    "application/json": components["schemas"]["ReadyzResponse.d817ae2"];
                 };
             };
             /** @description Bad Request */
@@ -1468,7 +1645,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HealthResponse.d817ae2"];
+                    "application/json": components["schemas"]["ReadyzResponse.d817ae2"];
                 };
             };
         };
