@@ -438,7 +438,6 @@ export function SseContextProvider({ children }: SseContextProviderProps) {
   // Establish connection on mount
   useEffect(() => {
     if (useSharedWorker.current) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Intentional SSE connection initiation
       createSharedWorkerConnection();
     } else {
       createDirectConnection();
