@@ -6,7 +6,8 @@
   "packageManager": "pnpm@9.0.0",
   "scripts": {
     "dev": "vite --host --port 3000",
-    "build": "pnpm generate:api:build && pnpm generate:routes && pnpm check && vite build && pnpm verify:build",
+    "build-fast": "pnpm generate:api:build && pnpm generate:routes && vite build && pnpm verify:build",
+    "build": "pnpm build-fast && pnpm check",
     "check": "pnpm check:lint && pnpm check:type-check && pnpm check:knip",
     "check:lint": "eslint .",
     "check:type-check": "tsc -b --noEmit",
