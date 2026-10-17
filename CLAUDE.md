@@ -73,7 +73,7 @@ Playwright records no video by default; `PLAYWRIGHT_RETAIN_VIDEO=true` keeps the
 
 When the backend has a database (`alembic.ini`), the run uses the PostgreSQL server the backend suite uses (`TEST_DATABASE_ADMIN_URL`, the `postgres` sidecar by default). Global setup builds `<project_name>_e2e_<run id>_seed` with the backend's `load-test-data`, each worker's backend serves a clone of it (`…_w<parallel index>`), and global teardown drops them; `tests/support/helpers/pg-admin.ts` holds the admin operations. A run's leftovers are dropped by the next run's sweep, which leaves a live run's databases alone.
 
-**Preview mode** runs the specs against a production build: each worker's frontend is `vite preview` on `dist/` (`scripts/testing-server.sh --preview`) instead of the dev server. Specs that need a production build skip without it, such as the SharedWorker ones in `sse-connectivity.spec.ts`: `shouldUseSharedWorker()` is false under the dev server. It takes two steps in the frontend directory, here `/work/ModernAppTemplate/root/test-app/frontend` once a suite run has set it up:
+**Preview mode** runs the specs against a production build: each worker's frontend is `vite preview` on `dist/` (`scripts/testing-server.sh --preview`) instead of the dev server. Specs that need a production build skip without it, such as the SharedWorker cases in `sse-connectivity.spec.ts` and `sse-auth-recovery.spec.ts`: `shouldUseSharedWorker()` is false under the dev server. It takes two steps in the frontend directory, here `/work/ModernAppTemplate/root/test-app/frontend` once a suite run has set it up:
 
 ```bash
 cexec modern-app sh -c 'cd /work/ModernAppTemplate/root/test-app/frontend && VITE_TEST_MODE=true pnpm build'

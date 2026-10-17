@@ -17,6 +17,7 @@ export interface DeploymentSseHelper {
 
 const DEFAULT_CONNECTION_TIMEOUT = 30_000;
 const BRIDGE_WAIT_TIMEOUT = 30_000;
+const MOUNT_CONNECTION_GRACE = 10_000;
 const BRIDGE_MISSING_ERROR = 'Deployment SSE controls bridge is not registered on window.';
 
 function ensureSerializableRequestId(requestId?: string): { requestId: string | null } {
@@ -53,12 +54,11 @@ export function createDeploymentSseHelper(page: Page): DeploymentSseHelper {
   };
 
   const disconnect = async (): Promise<void> => {
-    // The bridge can legitimately be missing here — DeploymentProvider lives
-    // below SseGate, so any test that ends with `isConnected === false`
-    // leaves no bridge to tear down. The underlying `disconnect()` exposed by
-    // the bridge is a documented no-op anyway, so we just return when the
-    // bridge is gone rather than blocking on a 30 s wait that will never
-    // satisfy.
+    // The bridge can legitimately be missing here: a test that navigated away
+    // from the app, or never loaded it, leaves no bridge to tear down. The
+    // underlying `disconnect()` exposed by the bridge is a documented no-op
+    // anyway, so we just return when the bridge is gone rather than blocking
+    // on a 30 s wait that will never satisfy.
     const hasBridge = await page.evaluate(() => Boolean(window.__deploymentSseControls));
     if (!hasBridge) {
       return;
@@ -78,8 +78,19 @@ export function createDeploymentSseHelper(page: Page): DeploymentSseHelper {
     // Wait for bridge to exist before triggering connect
     await waitForBridge(timeout);
 
-    const status = await getStatus();
-    if (!status.isConnected) {
+    // The provider connects on mount, and the app renders before the stream is
+    // ready (SseGate doesn't wait), so the bridge usually exists while the
+    // first stream is still connecting. connect() would replace that stream,
+    // so give it a moment first.
+    const connectedOnMount = await page
+      .waitForFunction(() => window.__deploymentSseControls?.getStatus().isConnected === true, undefined, {
+        timeout: Math.min(timeout, MOUNT_CONNECTION_GRACE),
+      })
+      .then(
+        () => true,
+        () => false
+      );
+    if (!connectedOnMount) {
       await connect();
     }
 
