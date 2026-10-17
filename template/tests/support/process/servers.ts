@@ -30,7 +30,7 @@ export type SSEGatewayServerHandle = ServerHandle;
 export async function startBackend(
   workerIndex: number,
   options: {
-    sqliteDbPath?: string;
+    databaseUrl?: string;
     streamLogs?: boolean;
     port?: number;
     excludePorts?: number[];
@@ -50,7 +50,9 @@ export async function startBackend(
     HOSTNAME,
     '--port',
     String(port),
-    ...(options.sqliteDbPath ? ['--sqlite-db', options.sqliteDbPath] : []),
+    // The worker's clone of the seed database. testing-server.sh sets
+    // FLASK_ENV=testing, which gives the backend its small test pool.
+    ...(options.databaseUrl ? ['--database-url', options.databaseUrl] : []),
   ];
 
   return startService({

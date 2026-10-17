@@ -49,4 +49,5 @@ export default defineConfig({
   outputDir: 'test-results/',
 
   globalSetup: './tests/support/global-setup.ts',
+  globalTeardown: './tests/support/global-teardown.ts',
 });
