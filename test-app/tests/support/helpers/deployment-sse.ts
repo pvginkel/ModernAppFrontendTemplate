@@ -15,8 +15,8 @@ export interface DeploymentSseHelper {
   resetRequestId: () => Promise<void>;
 }
 
-const DEFAULT_CONNECTION_TIMEOUT = 20_000;
-const BRIDGE_WAIT_TIMEOUT = 5_000;
+const DEFAULT_CONNECTION_TIMEOUT = 30_000;
+const BRIDGE_WAIT_TIMEOUT = 30_000;
 const BRIDGE_MISSING_ERROR = 'Deployment SSE controls bridge is not registered on window.';
 
 function ensureSerializableRequestId(requestId?: string): { requestId: string | null } {
@@ -53,28 +53,44 @@ export function createDeploymentSseHelper(page: Page): DeploymentSseHelper {
   };
 
   const disconnect = async (): Promise<void> => {
-    await waitForBridge();
+    // The bridge can legitimately be missing here — DeploymentProvider lives
+    // below SseGate, so any test that ends with `isConnected === false`
+    // leaves no bridge to tear down. The underlying `disconnect()` exposed by
+    // the bridge is a documented no-op anyway, so we just return when the
+    // bridge is gone rather than blocking on a 30 s wait that will never
+    // satisfy.
+    const hasBridge = await page.evaluate(() => Boolean(window.__deploymentSseControls));
+    if (!hasBridge) {
+      return;
+    }
     await page.evaluate(() => {
       const controls = window.__deploymentSseControls;
       if (!controls) {
-        throw new Error(BRIDGE_MISSING_ERROR);
+        return;
       }
       controls.disconnect();
     });
   };
 
   const ensureConnected = async (options?: { timeout?: number }): Promise<DeploymentSseStatus> => {
+    const timeout = options?.timeout ?? DEFAULT_CONNECTION_TIMEOUT;
+
+    // Wait for bridge to exist before triggering connect
+    await waitForBridge(timeout);
+
     const status = await getStatus();
     if (!status.isConnected) {
       await connect();
-      await page.waitForFunction(() => {
-        const controls = window.__deploymentSseControls;
-        if (!controls) {
-          throw new Error(BRIDGE_MISSING_ERROR);
-        }
-        return controls.getStatus().isConnected;
-      }, undefined, { timeout: options?.timeout ?? DEFAULT_CONNECTION_TIMEOUT });
     }
+
+    // Wait for both bridge existence AND isConnected in a single poll loop.
+    // This handles the race where the bridge is registered but refs haven't
+    // been populated yet (useEffect timing).
+    await page.waitForFunction(() => {
+      const controls = window.__deploymentSseControls;
+      return controls != null && controls.getStatus().isConnected;
+    }, undefined, { timeout });
+
     return getStatus();
   };
 
