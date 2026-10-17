@@ -7,7 +7,9 @@
 import { Link } from '@tanstack/react-router'
 import { PROJECT_TITLE, PROJECT_DESCRIPTION } from '@/lib/consts'
 import { StageIndicator } from './stage-indicator'
+{% if use_oidc %}
 import { UserDropdown } from './user-dropdown'
+{% endif %}
 
 interface TopBarProps {
   /** When provided, renders a hamburger menu button. Omit to hide the hamburger. */
@@ -76,9 +78,11 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
 
       {/* Deployment stage, hidden on prd */}
       <StageIndicator />
+{% if use_oidc %}
 
       {/* User dropdown */}
       <UserDropdown />
+{% endif %}
     </header>
   )
 }

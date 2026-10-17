@@ -96,7 +96,6 @@ _exclude:
   - "{% if not use_oidc %}src/hooks/use-auth.ts{% endif %}"
   - "{% if not use_oidc %}src/components/auth{% endif %}"
   - "{% if not use_oidc %}src/components/layout/user-dropdown.tsx{% endif %}"
-  - "{% if not use_oidc %}src/lib/auth-redirect.ts{% endif %}"
 
   # App shell (sidebar + top bar)
   - "{% if not use_app_shell %}src/components/layout/sidebar.tsx{% endif %}"
