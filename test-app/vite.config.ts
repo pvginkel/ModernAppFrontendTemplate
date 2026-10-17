@@ -92,6 +92,26 @@ const forwardOrigin: ProxyOptions['configure'] = (proxy) => {
   })
 }
 
+// Flush an SSE response's head at once, so EventSource.onopen fires on
+// connect, not on the first heartbeat (http-proxy holds the head until data
+// flows). Transfer-Encoding goes first: http-proxy drops chunking only after
+// `proxyRes`, and a chunked head over the raw piped stream makes the browser
+// buffer the stream forever. The `: proxy-connected` comment forces the flush.
+const configureSseProxy: ProxyOptions['configure'] = (proxy) => {
+  proxy.on('proxyRes', (proxyRes, _req, res) => {
+    const contentType = proxyRes.headers['content-type'] ?? ''
+    if (!contentType.includes('text/event-stream')) {
+      return
+    }
+    if (!res.headersSent) {
+      const headers = { ...proxyRes.headers }
+      delete headers['transfer-encoding']
+      res.writeHead(proxyRes.statusCode ?? 200, headers)
+    }
+    res.write(': proxy-connected\n\n')
+  })
+}
+
 const backendProxyTarget = process.env.BACKEND_URL || 'http://localhost:5000'
 const gatewayProxyTarget = process.env.SSE_GATEWAY_URL || 'http://localhost:3001'
 
@@ -110,6 +130,9 @@ export default defineConfig({
   server: {
     host: true,
     port: 3000,
+    // Fail on a busy port instead of moving to the next one: the dev stack
+    // and Playwright expect the port they asked for.
+    strictPort: true,
     allowedHosts: true,
     proxy: {
       ...loadAppProxies(),
@@ -117,6 +140,7 @@ export default defineConfig({
         target: gatewayProxyTarget,
         changeOrigin: true,
         secure: false,
+        configure: configureSseProxy,
       },
       '/api': {
         target: backendProxyTarget,
@@ -134,6 +158,7 @@ export default defineConfig({
         target: gatewayProxyTarget,
         changeOrigin: true,
         secure: false,
+        configure: configureSseProxy,
       },
       '/api': {
         target: backendProxyTarget,
