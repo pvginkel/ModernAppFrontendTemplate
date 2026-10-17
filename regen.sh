@@ -14,7 +14,8 @@ echo "==> Removing old test-app..."
 rm -rf test-app
 
 echo "==> Running copier copy..."
-poetry run copier copy . test-app --trust --defaults --vcs-ref HEAD \
+# copier is the backend template repo's pinned one: one pin for both templates.
+UV_LINK_MODE=copy uv run --project ../backend --locked copier copy . test-app --trust --defaults --vcs-ref HEAD \
   -d project_name=test-app \
   -d project_title="Test App" \
   -d project_description="Test application" \

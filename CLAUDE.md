@@ -8,15 +8,15 @@ For shared documentation (architecture, workflows, sync process), see the **pare
 
 - This repository is a submodule of `ModernAppTemplate`, mounted at `/work/ModernAppTemplate/frontend` inside the container.
 - Git operations (staging, committing, tagging) work normally.
-- The container includes poetry, node/npm/pnpm, and standard toolchains.
+- uv, node/npm/pnpm and the standard toolchains live in the `modern-app` tool container: prefix commands with `cexec modern-app`.
 
-## Poetry Virtual Environments
+## Toolchains
 
-The template project uses Poetry for copier. Generated test-app uses pnpm.
+This repo has no Python project of its own: copier comes from the backend template repo's uv project (`../backend`), which pins it for both templates. Generated test-app uses pnpm.
 
 ```bash
 # Template operations:
-cd /work/ModernAppTemplate/frontend && poetry run copier copy ...
+cd /work/ModernAppTemplate/frontend && uv run --project ../backend copier copy ...
 
 # Test-app operations:
 cd /work/ModernAppTemplate/frontend/test-app && pnpm run build
@@ -31,7 +31,6 @@ frontend/
 ├── test-app/           # Generated test application (DO NOT edit directly)
 ├── test-app-domain/    # Hand-written domain files copied into test-app after generation
 ├── tests/              # Mother project test suite (infrastructure E2E tests)
-├── pyproject.toml      # Dev dependencies (copier)
 ├── regen.sh            # Regeneration script
 └── .env.test           # Test environment overrides
 ```
