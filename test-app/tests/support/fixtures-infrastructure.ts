@@ -555,7 +555,7 @@ export const infrastructureFixtures = base.extend<InfrastructureFixtures, Intern
           frontendLogs.dispose();
         }
       },
-      { scope: 'worker', timeout: 120_000 },
+      { scope: 'worker', timeout: 300_000 },
     ],
   }
 );
