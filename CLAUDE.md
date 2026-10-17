@@ -80,7 +80,7 @@ cexec modern-app sh -c 'cd /work/ModernAppTemplate/root/test-app/frontend && VIT
 cexec modern-app sh -c 'cd /work/ModernAppTemplate/root/test-app/frontend && PLAYWRIGHT_PREVIEW_MODE=true pnpm playwright test --workers=1'
 ```
 
-`VITE_TEST_MODE=true` at build time puts the Playwright bridges into the bundle, so never set it for an image build (`verify:build` only warns). The root suite runner builds without it and does not set `PLAYWRIGHT_PREVIEW_MODE`, so a suite run skips the preview-only specs.
+`VITE_TEST_MODE=true` at build time puts the Playwright bridges into the bundle, so never set it for an image build (`verify:build` only warns). A spec that needs preview mode skips without `PLAYWRIGHT_PREVIEW_MODE=true` and carries the `@preview` tag. The root suite runner runs the specs on the dev server after a plain build, then a preview pass: it rebuilds with `VITE_TEST_MODE=true` and runs the `@preview` specs in preview mode, so a suite run, CI's included, runs every spec. It skips the preview pass when the selected specs hold no `@preview` one, and leaves `dist/` a test-mode build, which `.dockerignore` keeps out of the image.
 
 ## File Ownership
 

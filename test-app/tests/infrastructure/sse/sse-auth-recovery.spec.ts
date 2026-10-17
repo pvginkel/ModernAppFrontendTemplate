@@ -26,6 +26,9 @@ import {
   waitForSseEvent,
 } from '../../support/helpers/test-events';
 
+// The SharedWorker cases need a production build: they skip unless
+// PLAYWRIGHT_PREVIEW_MODE=true, and their @preview tag has the root suite
+// runner's preview pass run them.
 const PREVIEW_ONLY_REASON =
   'Needs PLAYWRIGHT_PREVIEW_MODE=true: the Vite dev server never uses the SharedWorker';
 
@@ -105,7 +108,8 @@ async function expectRejected(page: Page, status: number): Promise<void> {
 }
 
 for (const path of PATHS) {
-  test.describe(`SSE refusal recovery (${path.name})`, () => {
+  const tag = path.sharedWorker ? ['@preview'] : [];
+  test.describe(`SSE refusal recovery (${path.name})`, { tag }, () => {
     test('opens a new stream when the session is valid', async ({
       page,
       frontendUrl,
