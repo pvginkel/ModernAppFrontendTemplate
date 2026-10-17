@@ -561,7 +561,7 @@ export interface components {
              * @default null
              * @example New filters, improved performance, and bug fixes.
              */
-            changelog: string | null;
+            changelog?: string | null;
             /**
              * Request Id
              * @description Correlation identifier associated with an SSE subscriber
@@ -640,7 +640,7 @@ export interface components {
              * @description Item description
              * @default null
              */
-            description: string | null;
+            description?: string | null;
             /**
              * Name
              * @description Item name
@@ -651,7 +651,7 @@ export interface components {
              * @description Item quantity
              * @default 0
              */
-            quantity: number;
+            quantity?: number;
         };
         /**
          * ItemResponse
@@ -687,19 +687,19 @@ export interface components {
              * @description Item description
              * @default null
              */
-            description: string | null;
+            description?: string | null;
             /**
              * Name
              * @description Item name
              * @default null
              */
-            name: string | null;
+            name?: string | null;
             /**
              * Quantity
              * @description Item quantity
              * @default null
              */
-            quantity: number | null;
+            quantity?: number | null;
         };
         /**
          * TaskEventRequestSchema
@@ -715,7 +715,7 @@ export interface components {
              *       "value": 0.5
              *     }
              */
-            data: {
+            data?: {
                 [key: string]: unknown;
             } | null;
             /**
@@ -788,7 +788,7 @@ export interface components {
              * @example demo_task
              * @enum {string}
              */
-            task_type: "demo_task" | "failing_task";
+            task_type?: "demo_task" | "failing_task";
         };
         /**
          * TaskStartResponseSchema
@@ -801,7 +801,7 @@ export interface components {
              * @default started
              * @example started
              */
-            status: string;
+            status?: string;
             /**
              * Task Id
              * @description Unique task identifier
@@ -835,13 +835,13 @@ export interface components {
              * @description User email address
              * @default null
              */
-            email: string | null;
+            email?: string | null;
             /**
              * Name
              * @description User display name
              * @default null
              */
-            name: string | null;
+            name?: string | null;
             /**
              * Roles
              * @description User roles
@@ -863,13 +863,13 @@ export interface components {
              * @description User email address
              * @default null
              */
-            email: string | null;
+            email?: string | null;
             /**
              * Name
              * @description User display name
              * @default null
              */
-            name: string | null;
+            name?: string | null;
             /**
              * Roles
              * @description User roles

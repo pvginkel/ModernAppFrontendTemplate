@@ -167,7 +167,9 @@ export const infrastructureFixtures = base.extend<InfrastructureFixtures, Intern
             return;
           }
 
-          if (text.includes('Form submission error')) {
+          // showException logs 'Toast exception' outside production builds;
+          // the toast itself is what a test asserts on.
+          if (text.includes('Form submission error') || text.includes('Toast exception')) {
             return;
           }
 
@@ -370,9 +372,8 @@ export const infrastructureFixtures = base.extend<InfrastructureFixtures, Intern
         const frontendPort = await getPort({ exclude: [backendPort, gatewayPort] });
 
         // Pre-compute URLs from allocated ports so we can wire them before any
-        // service starts.  The backend's /health/readyz now checks SSE Gateway
-        // reachability, so the gateway must be up before the backend can pass
-        // its readiness probe.
+        // service starts: the gateway calls back to the backend, and the
+        // backend sends events through the gateway.
         const backendUrl = `http://127.0.0.1:${backendPort}`;
         const gatewayUrl = `http://127.0.0.1:${gatewayPort}`;
 
@@ -403,8 +404,10 @@ export const infrastructureFixtures = base.extend<InfrastructureFixtures, Intern
           }
         })();
 
-        // 2. Once the gateway is ready, start the backend (its readyz can now
-        //    reach the gateway).
+        // 2. Once the gateway is ready, start the backend. Its readyz doesn't
+        //    wait for the gateway (sse_gateway is a non-critical check), but
+        //    started second, the backend never sends to a gateway that isn't
+        //    up yet.
         const backendPromise = gatewayPromise.then(async gatewayHandle => {
           try {
             const backendHandle = await startBackend(workerInfo.workerIndex, {
