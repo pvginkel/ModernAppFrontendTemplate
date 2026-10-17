@@ -68,4 +68,5 @@ export VITE_TEST_MODE=true
 export NODE_ENV=test
 export VITE_CACHE_DIR="${cache_dir}"
 
-exec pnpm exec vite --host "${HOST}" --port "${PORT}" --strictPort --mode test
+# Vite directly: `pnpm exec` would leave a resident pnpm wrapper as its parent.
+exec node_modules/.bin/vite --host "${HOST}" --port "${PORT}" --strictPort --mode test

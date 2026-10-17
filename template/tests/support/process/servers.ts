@@ -173,6 +173,9 @@ async function startService(options: StartServiceOptions): Promise<ServerHandle>
     cwd: getFrontendRepoRoot(),
     env: options.env,
     stdio: ['pipe', 'pipe', 'pipe'],
+    // Own process group, so stopping a service stops its children too
+    // (uv's Python, Vite's workers); see signalProcessGroup.
+    detached: true,
   }) as ChildProcessWithoutNullStreams;
 
   registerForCleanup(child);
@@ -282,7 +285,7 @@ async function terminateProcess(
     console.log(`${formatPrefix(workerIndex, serviceLabel)} Stopping process (pid=${child.pid})`);
   }
 
-  child.kill('SIGTERM');
+  signalProcessGroup(child, 'SIGTERM');
 
   const exited = await waitForExit(child, 5_000);
 
@@ -290,8 +293,21 @@ async function terminateProcess(
     console.warn(
       `${formatPrefix(workerIndex, serviceLabel)} Process did not exit after SIGTERM; sending SIGKILL`
     );
-    child.kill('SIGKILL');
+    signalProcessGroup(child, 'SIGKILL');
     await waitForExit(child, 5_000);
+  }
+}
+
+/**
+ * Signal the service's whole process group (a negative PID), which `detached:
+ * true` gave it, so no child outlives the service and holds its port. Falls
+ * back to the process alone if the group is already gone.
+ */
+function signalProcessGroup(child: ChildProcessWithoutNullStreams, signal: NodeJS.Signals): void {
+  try {
+    process.kill(-child.pid!, signal);
+  } catch {
+    child.kill(signal);
   }
 }
 
@@ -402,13 +418,11 @@ function registerForCleanup(child: ChildProcessWithoutNullStreams): void {
   if (!cleanupHookRegistered) {
     cleanupHookRegistered = true;
 
+    // The worker is going away and can't wait for a graceful stop, so kill
+    // each service's process group outright.
     const shutdown = () => {
       for (const proc of activeChildren) {
-        try {
-          proc.kill('SIGTERM');
-        } catch {
-          // Ignore cleanup failures; process may already be terminating.
-        }
+        signalProcessGroup(proc, 'SIGKILL');
       }
     };
 
