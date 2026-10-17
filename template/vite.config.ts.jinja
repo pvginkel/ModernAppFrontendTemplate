@@ -176,14 +176,16 @@ export default defineConfig({
       }
     }
   },
+  // Test mode follows VITE_TEST_MODE, in a build too: `VITE_TEST_MODE=true
+  // pnpm build` gives the production build the Playwright bridges, for the
+  // preview-mode run (PLAYWRIGHT_PREVIEW_MODE=true). Any other build leaves
+  // them out, so never run the image's `pnpm build` with VITE_TEST_MODE set.
   define: {
-    'import.meta.env.VITE_TEST_MODE': process.env.NODE_ENV === 'production'
-      ? JSON.stringify('false')
-      : JSON.stringify(process.env.VITE_TEST_MODE || 'false'),
+    'import.meta.env.VITE_TEST_MODE': JSON.stringify(process.env.VITE_TEST_MODE || 'false'),
   },
   build: {
     rollupOptions: {
-      external: process.env.NODE_ENV === 'production' && process.env.VITE_TEST_MODE === 'true'
+      external: process.env.VITE_TEST_MODE !== 'true'
         ? ['./src/lib/test/*']
         : []
     },

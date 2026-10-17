@@ -61,6 +61,25 @@ pnpm run build       # production build
 - Use `consts.ts` (app-owned) for project name/title/ports instead of Jinja
 - Reserve `.jinja` for files with substantial conditional sections
 
+## Playwright
+
+The specs run from the root template's test-app, which pairs this test-app with the backend's. Run them by hand after `kc project build` (one worker: the modern-app container has 5 GiB):
+
+```bash
+cexec modern-app sh -c 'cd /work/ModernAppTemplate/root/test-app && uv run run-suite --suite frontend --frontend-args="--workers=1"'
+```
+
+Playwright records no video by default; `PLAYWRIGHT_RETAIN_VIDEO=true` keeps the videos of failed tests.
+
+**Preview mode** runs the specs against a production build: each worker's frontend is `vite preview` on `dist/` (`scripts/testing-server.sh --preview`) instead of the dev server. Specs that need a production build skip without it, such as the SharedWorker ones in `sse-connectivity.spec.ts`: `shouldUseSharedWorker()` is false under the dev server. It takes two steps in the frontend directory, here `/work/ModernAppTemplate/root/test-app/frontend` once a suite run has set it up:
+
+```bash
+cexec modern-app sh -c 'cd /work/ModernAppTemplate/root/test-app/frontend && VITE_TEST_MODE=true pnpm build'
+cexec modern-app sh -c 'cd /work/ModernAppTemplate/root/test-app/frontend && PLAYWRIGHT_PREVIEW_MODE=true pnpm playwright test --workers=1'
+```
+
+`VITE_TEST_MODE=true` at build time puts the Playwright bridges into the bundle, so never set it for an image build (`verify:build` only warns). The root suite runner builds without it and does not set `PLAYWRIGHT_PREVIEW_MODE`, so a suite run skips the preview-only specs.
+
 ## File Ownership
 
 ### Template-maintained (overwritten by `copier update`)

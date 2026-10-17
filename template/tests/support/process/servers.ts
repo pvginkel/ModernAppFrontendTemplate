@@ -91,6 +91,11 @@ export async function startFrontend(options: {
 
   const scriptPath = resolve(getFrontendRepoRoot(), './scripts/testing-server.sh');
   const args = ['--host', HOSTNAME, '--port', String(port)];
+  // Serve the production build in dist/ instead of the dev server. It must be
+  // built with VITE_TEST_MODE=true, or the Playwright bridges are missing.
+  if (process.env.PLAYWRIGHT_PREVIEW_MODE === 'true') {
+    args.push('--preview');
+  }
 
   return startService({
     workerIndex: options.workerIndex,

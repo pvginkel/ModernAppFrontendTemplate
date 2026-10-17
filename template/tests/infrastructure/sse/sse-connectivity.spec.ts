@@ -6,10 +6,19 @@
  * - Version events are delivered correctly through the React SSE infrastructure
  * - Task events are routed through the Vite proxy to the browser (envelope format)
  * - SharedWorker path delivers events correctly when enabled via URL parameter
+ *   (preview mode only)
  */
 import { test, expect } from '../../support/fixtures';
 import { makeUnique } from '../../support/helpers';
 import { extractSseData, waitForSseEvent } from '../../support/helpers/test-events';
+
+// Only a production build takes the SharedWorker path: under the Vite dev
+// server shouldUseSharedWorker() is false, so these tests would pass on the
+// direct connection. Preview mode serves such a build, made with
+// `VITE_TEST_MODE=true pnpm build`.
+const SHARED_WORKER_SKIP_REASON =
+  'Needs PLAYWRIGHT_PREVIEW_MODE=true: the Vite dev server never uses the SharedWorker';
+const sharedWorkerUnavailable = process.env.PLAYWRIGHT_PREVIEW_MODE !== 'true';
 
 test.describe('SSE connectivity', () => {
   test('connects through the Vite proxy, not directly to the gateway', async ({
@@ -278,6 +287,8 @@ test.describe('SSE connectivity', () => {
     backendUrl,
     deploymentSse,
   }) => {
+    test.skip(sharedWorkerUnavailable, SHARED_WORKER_SKIP_REASON);
+
     // Navigate with __sharedWorker parameter to enable SharedWorker path
     await page.goto(`${frontendUrl}?__sharedWorker`);
 
@@ -327,6 +338,8 @@ test.describe('SSE connectivity', () => {
     gatewayUrl,
     deploymentSse,
   }) => {
+    test.skip(sharedWorkerUnavailable, SHARED_WORKER_SKIP_REASON);
+
     // Navigate with __sharedWorker parameter to enable SharedWorker path
     await page.goto(`${frontendUrl}?__sharedWorker`);
 
