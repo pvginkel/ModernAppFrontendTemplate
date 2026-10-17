@@ -109,16 +109,18 @@ export class ToastHelper {
   async dismissToast(options?: { all?: boolean }): Promise<void> {
     if (options?.all) {
       const toasts = this.getAllToasts();
+      // A closed toast leaves the DOM at once, so the next one is first again.
       const count = await toasts.count();
 
       for (let i = 0; i < count; i++) {
-        const closeButton = toasts.nth(i).locator('button[aria-label="Close"]');
-        if (await closeButton.isVisible()) {
-          await closeButton.click();
+        const closeButton = this.getCloseButton(toasts.first());
+        if (!(await closeButton.isVisible())) {
+          break;
         }
+        await closeButton.click();
       }
     } else {
-      const closeButton = this.page.locator('[data-testid="app-shell.toast.item"] button[aria-label="Close"]').first();
+      const closeButton = this.getCloseButton(this.getToastContainer());
       if (await closeButton.isVisible()) {
         await closeButton.click();
       }
