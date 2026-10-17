@@ -65,12 +65,17 @@ async function fetchOpenAPISpec() {
       console.log(`✅ Successfully fetched OpenAPI spec from ${url}`);
       return spec;
     } catch (error) {
-      console.log(`❌ Failed to fetch from ${url}: ${error.message}`);
+      console.log(`❌ Failed to fetch from ${url}: ${error.message || error.code}`);
       lastError = error;
     }
   }
   
-  throw new Error(`Failed to fetch OpenAPI spec from all URLs. Last error: ${lastError.message}`);
+  throw new Error(
+    `Failed to fetch OpenAPI spec from all URLs. Last error: ${lastError.message || lastError.code}\n` +
+    `If no backend is running on port ${BACKEND_PORT}, run "scripts/regenerate-openapi.py --frontend" ` +
+    `from the repository root ("pnpm generate:api:with-backend" here): it starts a backend, ` +
+    `runs "pnpm generate:api" against it and stops it.`
+  );
 }
 
 /**
@@ -115,7 +120,9 @@ export async function fetchAndCache(options = {}) {
     const spec = loadCache();
     if (!spec) {
       throw new Error(
-        'No cached OpenAPI spec found. Run "pnpm generate:api" first to fetch and cache the spec.'
+        'No cached OpenAPI spec found. Run "scripts/regenerate-openapi.py --frontend" from the ' +
+        'repository root first ("pnpm generate:api:with-backend" here), or "pnpm generate:api" ' +
+        'against a running backend, to fetch and cache the spec.'
       );
     }
     return spec;

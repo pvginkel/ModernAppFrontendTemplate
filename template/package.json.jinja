@@ -16,6 +16,7 @@
     "generate:routes": "tsr generate",
     "generate:api": "node scripts/generate-api.js --fetch",
     "generate:api:build": "node scripts/generate-api.js --cache-only",
+    "generate:api:with-backend": "python3 ../scripts/regenerate-openapi.py --frontend",
     "verify:build": "node scripts/verify-production-build.cjs",
     "playwright": "playwright"
   },
