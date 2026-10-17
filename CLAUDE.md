@@ -12,7 +12,7 @@ For shared documentation (architecture, workflows, sync process), see the **pare
 
 ## Toolchains
 
-This repo has no Python project of its own: copier comes from the backend template repo's uv project (`../backend`), which pins it for both templates. Generated test-app uses pnpm.
+This repo has no Python project of its own: copier comes from the backend template repo's uv project (`../backend`), which pins it for both templates. The generated test-apps use pnpm.
 
 ```bash
 # Template operations:
@@ -29,31 +29,35 @@ frontend/
 ├── copier.yml          # Copier configuration and feature flags
 ├── template/           # Copier template source (Jinja2 + plain files)
 ├── test-app/           # Generated test application (DO NOT edit directly)
-├── test-app-domain/    # Hand-written domain files copied into test-app after generation
+├── test-app-no-shell/  # The same with use_app_shell=false (generated, gitignored)
+├── test-app-domain/    # Hand-written domain files copied into both test-apps after generation
 ├── tests/              # Mother project test suite (infrastructure E2E tests)
-├── regen.sh            # Regeneration script
+├── regen.sh            # Regeneration script (both test-apps)
 └── .env.test           # Test environment overrides
 ```
 
 ## Critical Rules
 
 ### 1. Never Edit test-app Directly
-`test-app/` is generated from the template. All changes go in `template/`, then regenerate.
+`test-app/` and `test-app-no-shell/` are generated from the template. All changes go in `template/`, then regenerate.
+
+The two differ only in `use_app_shell`: `test-app` renders the shell (`true`), `test-app-no-shell` renders without it (`false`, as ZigbeeControl, FieldnotesApp and PilotApp run). `kc project build` and `kc project lint` build and check both. Only `test-app` is tracked and copied into the root test-app, so Playwright runs the shell variant alone. `test-app-no-shell` is gitignored; `regen.sh` makes it a git repo of its own (one commit), because knip reads every `.gitignore` up to the git root and would otherwise see no files.
 
 ### 2. test-app-domain Contains App-Specific Files
-`test-app-domain/` has hand-written domain files (Items routes, navigation, API client, tests) that get copied into `test-app/` after Copier generation.
+`test-app-domain/` has hand-written domain files (Items routes, navigation, API client, tests) that get copied into the test-apps after Copier generation. `test-app-no-shell` skips the shell's: `sidebar-nav.ts`, the `tests/infrastructure/shell/` specs and `auth-shell-home.spec.ts`.
 
 ### 3. Always Regenerate After Template Changes
 ```bash
 cd /work/ModernAppTemplate/frontend
-bash regen.sh
+bash regen.sh                     # both test-apps
+bash regen.sh test-app-no-shell   # or only the named ones
 ```
 
 ### 4. Run Validation
+In `test-app` and in `test-app-no-shell`:
 ```bash
-cd /work/ModernAppTemplate/frontend/test-app
-pnpm run check      # lint + typecheck
-pnpm run build       # production build
+pnpm run check      # lint + typecheck + knip
+pnpm run build       # production build, then check
 ```
 
 ### 5. Minimize Jinja Usage
@@ -106,6 +110,7 @@ Infrastructure code — config, core source, providers, contexts, hooks, lib, co
 | Flag | Controls |
 |------|----------|
 | `use_oidc` | OIDC auth context, auth gate, user dropdown, login redirect, 401 handling |
+| `use_app_shell` | Sidebar, top bar and stage indicator; without it the app draws its own layout (`test-app-no-shell` renders `false`) |
 | `use_sse` | SSE context, SharedWorker, version tracking, deployment bar, task event hooks |
 
 ## Hook Contract
