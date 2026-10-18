@@ -91,7 +91,7 @@ importers:
         specifier: ^9.33.0
         version: 9.39.5(jiti@2.7.0)
       eslint-plugin-react-hooks:
-        specifier: ^7.0.1
+        specifier: ^7.1.1
         version: 7.1.1(eslint@9.39.5(jiti@2.7.0))
       eslint-plugin-react-refresh:
         specifier: ^0.4.20
