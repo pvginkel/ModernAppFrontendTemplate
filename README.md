@@ -102,6 +102,7 @@ Infrastructure code: config files, primitives, contexts, providers, hooks, lib, 
 - `tests/support/fixtures.ts` — extends infrastructure with domain page objects
 - `tests/support/selectors-domain.ts` — domain-specific test selectors
 - `package.json` — dependencies (app manages after generation)
+- `eslint.app.config.js` — the app's own ESLint blocks, which the template's `eslint.config.js` spreads after its own
 
 ## Component Architecture
 

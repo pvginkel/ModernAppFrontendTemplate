@@ -101,6 +101,7 @@ Infrastructure code — config, core source, providers, contexts, hooks, lib, co
 - `tests/support/fixtures.ts` — extends infrastructure with domain page objects
 - `tests/support/selectors-domain.ts` — domain-specific selectors
 - `package.json` — dependencies (app manages after generation)
+- `eslint.app.config.js` — the app's own ESLint blocks (an empty array), spread last by the template-owned `eslint.config.js`
 - `.env.example` — environment documentation
 - `public/favicon.png` — app icon
 - `.dockerignore` — image build context excludes
@@ -125,6 +126,7 @@ The app customizes behavior through extension points:
 6. **API layer** — regenerate `src/lib/api/generated/` from OpenAPI spec
 7. **Test fixtures** — extend `tests/support/fixtures-infrastructure.ts` in `tests/support/fixtures.ts`
 8. **Test selectors** — add domain selectors in `tests/support/selectors-domain.ts`
+9. **Lint rules** — the app's own ESLint blocks in `eslint.app.config.js`
 
 ## OpenAPI Spec Pipeline
 
