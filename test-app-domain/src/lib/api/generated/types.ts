@@ -174,7 +174,9 @@ export interface paths {
          *
          *     A connect is accepted only for a caller the API would serve, and is refused before it is registered, so a refused stream never receives an event and never counts in the connection metrics. The gateway turns a refusal into an in-stream ``rejected`` event and ends the stream.
          *
-         *     Returns:     200 on success     401 if the callback secret fails (production only), or the         forwarded token is missing or invalid     403 if the caller holds none of the app's roles (or lacks the         read role, where one is set)     400 if payload invalid or request_id missing
+         *     Returns:     200 with an empty object on success
+         *
+         *     Raises:     AuthenticationException: 401, the callback secret fails (production         only), or the forwarded token is missing or invalid     AuthorizationException: 403, the caller holds none of the app's roles         (or lacks the read role, where one is set)     ValidationException: 400, the body is not a JSON object, the action         is unknown, or the request_id is missing or malformed     pydantic.ValidationError: 400, the payload is not a valid callback
          */
         post: operations["post__api_sse_callback"];
         delete?: never;
@@ -443,6 +445,8 @@ export interface paths {
         /**
          * Send a fake task event to a specific SSE connection for testing.
          * @description Allows integration tests to simulate task events without running actual background tasks. The event is sent directly to the SSE connection identified by request_id.
+         *
+         *     Raises:     RecordNotFoundException: 404, no SSE connection has that request_id     ExternalServiceException: 502, the SSE Gateway did not take the event
          */
         post: operations["post__api_testing_sse_task-event"];
         delete?: never;
@@ -569,6 +573,51 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * ApiErrorResponseSchema
+         * @description The error envelope every error handler answers with.
+         *
+         *     It mirrors ``build_error_response()`` in ``app/utils/flask_error_handlers.py``;
+         *     change both together. Use it to document error responses in ``@api.validate``,
+         *     for example ``HTTP_502=ApiErrorResponseSchema`` on an endpoint that calls an
+         *     external service. One handler differs: a ``pydantic.ValidationError`` raised
+         *     in a handler answers 400 with ``details.errors``, a list of
+         *     ``{"message", "field"}``, instead of ``details.message``.
+         */
+        "ApiErrorResponseSchema.c2a0d71": {
+            /**
+             * Code
+             * @description Machine-readable error code; every business-logic exception sets one
+             * @default null
+             * @example AUTHORIZATION_FAILED
+             */
+            code?: string | null;
+            /**
+             * Correlationid
+             * @description The request's correlation ID, when it has one
+             * @default null
+             */
+            correlationId?: string | null;
+            /** @description Error details */
+            details: components["schemas"]["ApiErrorResponseSchema.c2a0d71.ApiErrorDetailsSchema"];
+            /**
+             * Error
+             * @description Error message
+             * @example Authorization failed
+             */
+            error: string;
+        };
+        /**
+         * ApiErrorDetailsSchema
+         * @description The ``details`` object of the error envelope ``build_error_response`` builds.
+         */
+        "ApiErrorResponseSchema.c2a0d71.ApiErrorDetailsSchema": {
+            /**
+             * Message
+             * @description Human-readable error description
+             */
+            message: string;
+        };
         /**
          * ContentHtmlQuerySchema
          * @description Query parameters for deterministic HTML content fixtures.
@@ -813,6 +862,22 @@ export interface components {
             status: "ok" | "error" | "disabled";
         };
         /**
+         * TaskActionResponse
+         * @description Response when a task is cancelled or removed.
+         */
+        "TaskActionResponse.70db092": {
+            /**
+             * Message
+             * @description What was done
+             */
+            message: string;
+            /**
+             * Success
+             * @description Whether the action was taken; an action that can't be is a 404
+             */
+            success: boolean;
+        };
+        /**
          * TaskEventRequestSchema
          * @description Request schema for sending fake task events in testing mode.
          */
@@ -877,6 +942,57 @@ export interface components {
             task_id: string;
         };
         /**
+         * TaskInfo
+         * @description In-memory task metadata.
+         */
+        "TaskInfo.70db092": {
+            /**
+             * End Time
+             * @description Task completion timestamp
+             * @default null
+             */
+            end_time?: string | null;
+            /**
+             * Error
+             * @description Error message if task failed
+             * @default null
+             */
+            error?: string | null;
+            /**
+             * Result
+             * @description Task result data
+             * @default null
+             */
+            result?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Start Time
+             * Format: date-time
+             * @description Task start timestamp
+             */
+            start_time: string;
+            /** @description Current task status */
+            status: components["schemas"]["TaskInfo.70db092.TaskStatus"];
+            /**
+             * Subject
+             * @description Subject of the user who started the task, and who owns it
+             * @default null
+             */
+            subject?: string | null;
+            /**
+             * Task Id
+             * @description Unique task identifier
+             */
+            task_id: string;
+        };
+        /**
+         * TaskStatus
+         * @description Task execution status.
+         * @enum {string}
+         */
+        "TaskInfo.70db092.TaskStatus": "pending" | "running" | "completed" | "failed" | "cancelled";
+        /**
          * TaskStartRequestSchema
          * @description Request schema for starting a test task.
          */
@@ -918,23 +1034,6 @@ export interface components {
              * @description Unique task identifier
              */
             task_id: string;
-        };
-        /**
-         * TestErrorResponseSchema
-         * @description Error response schema for testing endpoints.
-         */
-        "TestErrorResponseSchema.6b6ce9f": {
-            /**
-             * Error
-             * @description Error message
-             */
-            error: string;
-            /**
-             * Status
-             * @description Error status code
-             * @example not_found
-             */
-            status: string;
         };
         /**
          * TestSessionCreateSchema
@@ -1263,7 +1362,35 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskActionResponse.70db092"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError.6a07bef"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseSchema.c2a0d71"];
+                };
+            };
+        };
     };
     "post__api_tasks_{task_id}_cancel": {
         parameters: {
@@ -1275,7 +1402,35 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskActionResponse.70db092"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError.6a07bef"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseSchema.c2a0d71"];
+                };
+            };
+        };
     };
     "get__api_tasks_{task_id}_status": {
         parameters: {
@@ -1287,7 +1442,35 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskInfo.70db092"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError.6a07bef"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseSchema.c2a0d71"];
+                };
+            };
+        };
     };
     post__api_testing_auth_clear: {
         parameters: {
@@ -1448,7 +1631,24 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError.6a07bef"];
+                };
+            };
+        };
     };
     "post__api_testing_sse_task-event": {
         parameters: {
@@ -1478,7 +1678,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TestErrorResponseSchema.6b6ce9f"];
+                    "application/json": components["schemas"]["ValidationError.6a07bef"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseSchema.c2a0d71"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponseSchema.c2a0d71"];
                 };
             };
         };

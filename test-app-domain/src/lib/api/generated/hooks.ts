@@ -5,6 +5,8 @@ import { api } from './client';
 import type { paths, components } from './types';
 
 // Type aliases for better developer experience
+export type ApiErrorResponseSchema_c2a0d71 = components['schemas']['ApiErrorResponseSchema.c2a0d71'];
+export type ApiErrorResponseSchema_c2a0d71_ApiErrorDetailsSchema = components['schemas']['ApiErrorResponseSchema.c2a0d71.ApiErrorDetailsSchema'];
 export type ContentHtmlQuerySchema_7ccab41 = components['schemas']['ContentHtmlQuerySchema.7ccab41'];
 export type ContentImageQuerySchema_7ccab41 = components['schemas']['ContentImageQuerySchema.7ccab41'];
 export type DeploymentTriggerRequestSchema_6b6ce9f = components['schemas']['DeploymentTriggerRequestSchema.6b6ce9f'];
@@ -17,11 +19,13 @@ export type ItemResponse_9bf1f2e = components['schemas']['ItemResponse.9bf1f2e']
 export type ItemUpdate_9bf1f2e = components['schemas']['ItemUpdate.9bf1f2e'];
 export type ReadyzResponse_d817ae2 = components['schemas']['ReadyzResponse.d817ae2'];
 export type ReadyzResponse_d817ae2_ReadinessCheckSchema = components['schemas']['ReadyzResponse.d817ae2.ReadinessCheckSchema'];
+export type TaskActionResponse_70db092 = components['schemas']['TaskActionResponse.70db092'];
 export type TaskEventRequestSchema_6b6ce9f = components['schemas']['TaskEventRequestSchema.6b6ce9f'];
 export type TaskEventResponseSchema_6b6ce9f = components['schemas']['TaskEventResponseSchema.6b6ce9f'];
+export type TaskInfo_70db092 = components['schemas']['TaskInfo.70db092'];
+export type TaskInfo_70db092_TaskStatus = components['schemas']['TaskInfo.70db092.TaskStatus'];
 export type TaskStartRequestSchema_6b6ce9f = components['schemas']['TaskStartRequestSchema.6b6ce9f'];
 export type TaskStartResponseSchema_6b6ce9f = components['schemas']['TaskStartResponseSchema.6b6ce9f'];
-export type TestErrorResponseSchema_6b6ce9f = components['schemas']['TestErrorResponseSchema.6b6ce9f'];
 export type TestSessionCreateSchema_e510e64 = components['schemas']['TestSessionCreateSchema.e510e64'];
 export type TestSessionResponseSchema_e510e64 = components['schemas']['TestSessionResponseSchema.e510e64'];
 export type UiSetupResponseSchema_630d3b9 = components['schemas']['UiSetupResponseSchema.630d3b9'];
@@ -240,7 +244,7 @@ export function usePostSseCallback(options?: Omit<Parameters<typeof useMutation>
 /**
  * Remove a completed task from registry.
  */
-export function useDeleteTasksByTaskId(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<void, Error, { path: DeleteTasksByTaskIdParameters['path'] }>> {
+export function useDeleteTasksByTaskId(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<TaskActionResponse_70db092, Error, { path: DeleteTasksByTaskIdParameters['path'] }>> {
   const queryClient = useQueryClient();
 
   // @ts-ignore
@@ -261,7 +265,7 @@ export function useDeleteTasksByTaskId(options?: Omit<Parameters<typeof useMutat
 /**
  * Cancel a running task.
  */
-export function usePostTasksCancelByTaskId(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<void, Error, { path: PostTasksCancelByTaskIdParameters['path'] }>> {
+export function usePostTasksCancelByTaskId(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<TaskActionResponse_70db092, Error, { path: PostTasksCancelByTaskIdParameters['path'] }>> {
   const queryClient = useQueryClient();
 
   // @ts-ignore
@@ -282,7 +286,7 @@ export function usePostTasksCancelByTaskId(options?: Omit<Parameters<typeof useM
 /**
  * Get current status of a task.
  */
-export function useGetTasksStatusByTaskId(params?: any, options?: Omit<Parameters<typeof useQuery>[0], 'queryKey' | 'queryFn'>): ReturnType<typeof useQuery<void>> {
+export function useGetTasksStatusByTaskId(params?: any, options?: Omit<Parameters<typeof useQuery>[0], 'queryKey' | 'queryFn'>): ReturnType<typeof useQuery<TaskInfo_70db092>> {
   // @ts-ignore
   return useQuery({
     queryKey: ['getTasksStatusByTaskId', params],
