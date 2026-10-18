@@ -86,6 +86,36 @@ _skip_if_exists:
   # App-owned test extensions
   - "tests/support/fixtures.ts"
   - "tests/support/selectors-domain.ts"
+  # App-owned lint rules, spread after the template's in eslint.config.js
+  - "eslint.app.config.js"
+  # The same files again under frontend/, where every app keeps this template.
+  # In a monorepo, `copier update` (9.11.3) applies its diff with `git apply
+  # --exclude <entry>` at the git toplevel, where the paths carry the frontend/
+  # prefix: the entries above never match there, and the update merges the
+  # template's changes into every app-owned file the app has edited (MAT-16).
+  # These twins match. The entries above still do the rest: skip the existing
+  # file when the template renders. Keep the two lists in step.
+  - "frontend/src/lib/consts.ts"
+  - "frontend/src/components/layout/sidebar-nav.ts"
+  - "frontend/package.json"
+  - "frontend/.env.example"
+  - "frontend/public/favicon.png"
+  - "frontend/.dockerignore"
+  - "frontend/src/styles/app-theme.css"
+  - "frontend/src/styles/button.ts"
+  - "frontend/src/styles/alert.ts"
+  - "frontend/src/styles/card.ts"
+  - "frontend/src/styles/toast.ts"
+  - "frontend/src/styles/input.ts"
+  - "frontend/src/styles/notification.ts"
+  - "frontend/src/styles/progress-bar.ts"
+  - "frontend/src/styles/index.ts"
+  - "frontend/src/components/ui/index.ts"
+  - "frontend/src/routes/index.tsx"
+  - "frontend/vite-proxy-extensions.ts"
+  - "frontend/tests/support/fixtures.ts"
+  - "frontend/tests/support/selectors-domain.ts"
+  - "frontend/eslint.app.config.js"
 
 # ── Feature-flagged file exclusion ────────────────────────────────────
 
