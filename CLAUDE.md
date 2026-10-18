@@ -41,7 +41,7 @@ frontend/
 ### 1. Never Edit test-app Directly
 `test-app/` and `test-app-no-shell/` are generated from the template. All changes go in `template/`, then regenerate.
 
-The two differ only in `use_app_shell`: `test-app` renders the shell (`true`), `test-app-no-shell` renders without it (`false`, as ZigbeeControl, FieldnotesApp and PilotApp run). `kc project build` and `kc project lint` build and check both. Only `test-app` is tracked and copied into the root test-app, so Playwright runs the shell variant alone. `test-app-no-shell` is gitignored; `regen.sh` makes it a git repo of its own (one commit), because knip reads every `.gitignore` up to the git root and would otherwise see no files.
+The two differ only in `use_app_shell`: `test-app` renders the shell (`true`), `test-app-no-shell` renders without it (`false`, as ZigbeeControl, FieldnotesApp and PilotApp run). `kc project build` and `kc project lint` build and check both. Only `test-app` is tracked and copied into `root/test-app`, so Playwright runs the shell variant alone. `root/test-app-no-storage` (the root and backend templates without a database and S3) copies `test-app-no-shell`, but runs only its backend suite there. `test-app-no-shell` is gitignored; `regen.sh` makes it a git repo of its own (one commit), because knip reads every `.gitignore` up to the git root and would otherwise see no files.
 
 ### 2. test-app-domain Contains App-Specific Files
 `test-app-domain/` has hand-written domain files (Items routes, navigation, API client, tests) that get copied into the test-apps after Copier generation. `test-app-no-shell` skips the shell's: `sidebar-nav.ts`, the `tests/infrastructure/shell/` specs and `auth-shell-home.spec.ts`.

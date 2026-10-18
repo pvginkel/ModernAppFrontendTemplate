@@ -6,8 +6,9 @@
 #   test-app           use_app_shell=true. Tracked; the root test-app copies it,
 #                      and Playwright runs it there.
 #   test-app-no-shell  use_app_shell=false, as ZigbeeControl, FieldnotesApp and
-#                      PilotApp run. Built and checked only, never copied or
-#                      run. Gitignored: tracking it would repeat test-app's
+#                      PilotApp run. Built and checked, never run: the root's
+#                      test-app-no-storage copies it, for its backend suite
+#                      alone. Gitignored: tracking it would repeat test-app's
 #                      regen churn (the same lockfile) on every template commit.
 #
 # Usage:
