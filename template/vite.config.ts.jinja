@@ -115,9 +115,6 @@ const configureSseProxy: ProxyOptions['configure'] = (proxy) => {
 
 {% endif %}
 const backendProxyTarget = process.env.BACKEND_URL || 'http://localhost:{{ backend_port }}'
-{% if use_sse %}
-const gatewayProxyTarget = process.env.SSE_GATEWAY_URL || 'http://localhost:{{ sse_gateway_port }}'
-{% endif %}
 
 export default defineConfig({
   plugins: [tailwindcss(), react(), versionPlugin(), backendProxyStatusPlugin(backendProxyTarget)],
@@ -142,7 +139,7 @@ export default defineConfig({
       ...loadAppProxies(),
 {% if use_sse %}
       '/api/sse': {
-        target: gatewayProxyTarget,
+        target: backendProxyTarget,
         changeOrigin: true,
         secure: false,
         configure: configureSseProxy,
@@ -162,7 +159,7 @@ export default defineConfig({
       ...loadAppProxies(),
 {% if use_sse %}
       '/api/sse': {
-        target: gatewayProxyTarget,
+        target: backendProxyTarget,
         changeOrigin: true,
         secure: false,
         configure: configureSseProxy,

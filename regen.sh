@@ -37,7 +37,6 @@ regen() {
     -d author_name="Test Author" \
     -d author_email="test@example.com" \
     -d backend_port=5000 \
-    -d sse_gateway_port=3001 \
     -d frontend_port=3000 \
     -d use_oidc=true \
     -d use_sse=true \

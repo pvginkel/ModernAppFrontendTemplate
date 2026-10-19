@@ -221,21 +221,16 @@ export function usePatchItemsByItemId(options?: Omit<Parameters<typeof useMutati
 }
 
 /**
- * Handle SSE Gateway connect/disconnect callbacks.
+ * The browser's SSE stream.
  */
-export function usePostSseCallback(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<void, Error, void>> {
-  const queryClient = useQueryClient();
-
+export function useGetSseStream(params?: any, options?: Omit<Parameters<typeof useQuery>[0], 'queryKey' | 'queryFn'>): ReturnType<typeof useQuery<void>> {
   // @ts-ignore
-  return useMutation({
-    mutationFn: async () => {
-      const result = await api.POST('/api/sse/callback' as const) as { data?: unknown; error?: unknown; response: Response };
+  return useQuery({
+    queryKey: ['getSseStream', params],
+    queryFn: async () => {
+      const result = await api.GET('/api/sse/stream' as const, { params }) as { data?: unknown; error?: unknown; response: Response };
       if (result.error) throw toApiError(result.error, result.response.status);
       return result.data;
-    },
-    onSuccess: () => {
-      // Invalidate relevant queries after successful mutation
-      queryClient.invalidateQueries();
     },
     ...options
   });
@@ -464,7 +459,7 @@ export function useGetTestingLogsStream(params?: any, options?: Omit<Parameters<
 }
 
 /**
- * Make the next SSE Gateway connect callback refuse the connection.
+ * Make the next SSE stream connect refuse the connection.
  */
 export function usePostTestingSseForceCallbackError(options?: Omit<Parameters<typeof useMutation>[0], 'mutationFn'>): ReturnType<typeof useMutation<void, Error, { query: PostTestingSseForceCallbackErrorParameters['query'] }>> {
   const queryClient = useQueryClient();

@@ -32,11 +32,6 @@ backend_port:
   default: 5000
   help: "Backend API port (Vite proxy target for /api)"
 
-sse_gateway_port:
-  type: int
-  default: 3001
-  help: "SSE Gateway port (Vite proxy target for /api/sse)"
-
 frontend_port:
   type: int
   default: 3000

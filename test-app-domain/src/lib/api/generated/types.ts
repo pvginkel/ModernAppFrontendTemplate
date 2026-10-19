@@ -159,26 +159,24 @@ export interface paths {
         patch: operations["patch__api_items_{item_id}"];
         trace?: never;
     };
-    "/api/sse/callback": {
+    "/api/sse/stream": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
         /**
-         * Handle SSE Gateway connect/disconnect callbacks.
-         * @description This endpoint receives callbacks from the SSE Gateway when clients connect or disconnect. It extracts the request_id from the callback URL and calls SSEConnectionManager, which then notifies observers.
+         * The browser's SSE stream.
+         * @description Accepted only for a caller the API would serve a GET, and refused before the connection is registered, so a refused stream never receives an event and never counts in the connection metrics.
          *
-         *     A connect is accepted only for a caller the API would serve, and is refused before it is registered, so a refused stream never receives an event and never counts in the connection metrics. The gateway turns a refusal into an in-stream ``rejected`` event and ends the stream.
+         *     Query Parameters:     request_id: The browser's stream ID; a new stream with the same one         replaces the old
          *
-         *     Returns:     200 with an empty object on success
-         *
-         *     Raises:     AuthenticationException: 401, the callback secret fails (production         only), or the forwarded token is missing or invalid     AuthorizationException: 403, the caller holds none of the app's roles         (or lacks the read role, where one is set)     ValidationException: 400, the body is not a JSON object, the action         is unknown, or the request_id is missing or malformed     pydantic.ValidationError: 400, the payload is not a valid callback
+         *     Returns:     200 ``text/event-stream``: ``ready`` and the events, or ``rejected``
          */
-        post: operations["post__api_sse_callback"];
+        get: operations["get__api_sse_stream"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -419,8 +417,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Make the next SSE Gateway connect callback refuse the connection.
-         * @description Single-shot: the callback after it behaves normally again. The gateway turns the refusal into an in-stream ``rejected`` event, which drives the frontend's refresh-and-reconnect path.
+         * Make the next SSE stream connect refuse the connection.
+         * @description Single-shot: the connect after it behaves normally again. The stream answers the refusal with an in-stream ``rejected`` event, which drives the frontend's refresh-and-reconnect path.
          *
          *     Query Parameters:     status: 401 or 403 (the schema refuses anything else with 400)
          *
@@ -446,7 +444,7 @@ export interface paths {
          * Send a fake task event to a specific SSE connection for testing.
          * @description Allows integration tests to simulate task events without running actual background tasks. The event is sent directly to the SSE connection identified by request_id.
          *
-         *     Raises:     RecordNotFoundException: 404, no SSE connection has that request_id     ExternalServiceException: 502, the SSE Gateway did not take the event
+         *     Raises:     RecordNotFoundException: 404, no SSE connection has that request_id     ExternalServiceException: 502, the connection did not take the event         (it closed meanwhile, or its queue was full)
          */
         post: operations["post__api_testing_sse_task-event"];
         delete?: never;
@@ -708,7 +706,7 @@ export interface components {
         "ForceSSECallbackErrorQuerySchema.6b6ce9f": {
             /**
              * Status
-             * @description HTTP status the next SSE connect callback refuses with (401 or 403).
+             * @description HTTP status the next SSE stream connect refuses with (401 or 403).
              * @enum {integer}
              */
             status: 401 | 403;
@@ -1342,7 +1340,7 @@ export interface operations {
             };
         };
     };
-    post__api_sse_callback: {
+    get__api_sse_stream: {
         parameters: {
             query?: never;
             header?: never;
@@ -1623,7 +1621,7 @@ export interface operations {
     "post__api_testing_sse_force-callback-error": {
         parameters: {
             query: {
-                /** @description HTTP status the next SSE connect callback refuses with (401 or 403). */
+                /** @description HTTP status the next SSE stream connect refuses with (401 or 403). */
                 status: 401 | 403;
             };
             header?: never;

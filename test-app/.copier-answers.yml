@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: v0.21.0-9-gf8ee459
+_commit: v0.22.0-1-g6179907
 _src_path: .
 author_email: test@example.com
 author_name: Test Author
@@ -8,7 +8,6 @@ frontend_port: 3000
 project_description: Test application
 project_name: test-app
 project_title: Test App
-sse_gateway_port: 3001
 use_app_shell: true
 use_oidc: true
 use_sse: true
